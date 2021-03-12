@@ -18,7 +18,6 @@ fn main() {
     let mut settings: config::Settings = conf.try_into().unwrap();
     // log::info!("{:?}", settings);
 
-    // let config = FluidexConfig::from_env();
     // let client = EthereumGateway::from_config(&config);
 
     // let (eth_req_sender, eth_req_receiver) = mpsc::channel(256);
