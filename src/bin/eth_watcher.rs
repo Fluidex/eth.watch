@@ -3,18 +3,7 @@ use std::time::Duration;
 use futures::{channel::mpsc, SinkExt};
 use tokio::{runtime::Runtime, time};
 
-fn init_logging() {
-    // Always print backtrace on panic.
-    ::std::env::set_var("RUST_BACKTRACE", "1");
-    match ::std::env::var("RUST_LOG") {
-        Ok(value) => {
-            if value.len() == 0 {
-                ::std::env::set_var("RUST_LOG", "info");
-            }
-        }
-        Err(_) => ::std::env::set_var("RUST_LOG", "info"),
-    }
-}
+use eth_watcher::config;
 
 fn main() {
     let mut main_runtime = Runtime::new().expect("main runtime start");
@@ -26,9 +15,8 @@ fn main() {
     let mut conf = config_rs::Config::new();
     let config_file = dotenv::var("CONFIG_FILE").unwrap();
     conf.merge(config_rs::File::with_name(&config_file)).unwrap();
-    // let mut settings: config::Settings = conf.try_into().unwrap();
-    log::info!("{:?}", conf);
-
+    let mut settings: config::Settings = conf.try_into().unwrap();
+    // log::info!("{:?}", settings);
 
     // let config = FluidexConfig::from_env();
     // let client = EthereumGateway::from_config(&config);

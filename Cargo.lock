@@ -100,6 +100,8 @@ dependencies = [
  "env_logger",
  "futures",
  "log",
+ "serde 1.0.124",
+ "serde_json",
  "tokio",
 ]
 
@@ -524,6 +526,9 @@ name = "serde"
 version = "1.0.124"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bd761ff957cb2a45fbb9ab3da6512de9de55872866160b23c25f1a841e99d29f"
+dependencies = [
+ "serde_derive",
+]
 
 [[package]]
 name = "serde-hjson"
@@ -536,6 +541,17 @@ dependencies = [
  "num-traits 0.1.43",
  "regex",
  "serde 0.8.23",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.124"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1800f7693e94e186f5e25a28291ae1570da908aff7d97a095dec1e56ff99069b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
