@@ -71,6 +71,54 @@ impl<W: EthClient> EthWatch<W> {
         }
     }
 
+    /// Atomically replaces the stored Ethereum state.
+    fn set_new_state(&mut self, new_state: ETHState) {
+        self.eth_state = new_state;
+    }
+
+    // TODO:
+    async fn poll_eth_node(&mut self) -> anyhow::Result<()> {
+        // let start = Instant::now();
+        // let last_block_number = self.client.block_number().await?;
+
+        // if last_block_number > self.eth_state.last_ethereum_block() {
+        //     self.process_new_blocks(last_block_number).await?;
+        // }
+
+        // metrics::histogram!("eth_watcher.poll_eth_node", start.elapsed());
+        Ok(())
+    }
+
+    // TODO try to move it to eth client
+    fn is_backoff_requested(&self, error: &anyhow::Error) -> bool {
+        error.to_string().contains("429 Too Many Requests")
+    }
+
+    fn enter_backoff_mode(&mut self) {
+        let backoff_until = Instant::now() + RATE_LIMIT_DELAY;
+        self.mode = WatcherMode::Backoff(backoff_until);
+        // This is needed to track how much time is spent in backoff mode
+        // and trigger grafana alerts
+        // TODO:
+        // metrics::histogram!("eth_watcher.enter_backoff_mode", RATE_LIMIT_DELAY);
+    }
+
+    fn polling_allowed(&mut self) -> bool {
+        match self.mode {
+            WatcherMode::Working => true,
+            WatcherMode::Backoff(delay_until) => {
+                if Instant::now() >= delay_until {
+                    log::info!("Exiting the backoff mode");
+                    self.mode = WatcherMode::Working;
+                    true
+                } else {
+                    // We have to wait more until backoff is disabled.
+                    false
+                }
+            }
+        }
+    }
+
     // TODO:
     pub async fn run(mut self, mut eth_watch_req: mpsc::Receiver<EthWatchRequest>) {}
 }
