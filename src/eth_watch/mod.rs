@@ -5,9 +5,7 @@ use futures::{
 };
 
 // Local deps
-use self::{
-    client::EthClient,
-};
+use self::client::EthClient;
 
 pub use client::EthHttpClient;
 
@@ -16,7 +14,7 @@ mod client;
 // TODO:
 #[derive(Debug)]
 pub enum EthWatchRequest {
-	PollETHNode
+    PollETHNode,
 }
 
 // pub struct EthWatch<W: EthClient> {
