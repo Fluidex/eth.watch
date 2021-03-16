@@ -1,5 +1,17 @@
+// External uses
+use futures::{
+    channel::{mpsc, oneshot},
+    SinkExt, StreamExt,
+};
+
 mod client;
 pub use client::EthHttpClient;
+
+// TODO:
+#[derive(Debug)]
+pub enum EthWatchRequest {
+	PollETHNode
+}
 
 // pub struct EthWatch<W: EthClient> {
 //     client: W,
@@ -34,4 +46,7 @@ impl EthWatch {
             number_of_confirmations_for_event,
         }
     }
+
+    // TODO:
+    pub async fn run(mut self, mut eth_watch_req: mpsc::Receiver<EthWatchRequest>) {}
 }
