@@ -399,6 +399,7 @@ dependencies = [
  "config",
  "dotenv",
  "env_logger",
+ "ethabi",
  "futures 0.3.13",
  "log",
  "serde 1.0.124",
