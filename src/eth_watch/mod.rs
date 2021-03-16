@@ -132,7 +132,7 @@ impl<W: EthClient> EthWatch<W> {
                     break block;
                 }
                 Err(error) => {
-                    vlog::warn!(
+                    log::warn!(
                         "Unable to fetch last block number: '{}'. Retrying again in {} seconds",
                         error,
                         RATE_LIMIT_DELAY.as_secs()
