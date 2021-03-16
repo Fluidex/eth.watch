@@ -21,15 +21,12 @@ use tokio::{task::JoinHandle, time};
 use web3::types::{Address, BlockNumber};
 
 // Local deps
-use self::{
-    client::EthClient,
-    eth_state::ETHState,
-};
+use self::{client::EthClient, eth_state::ETHState};
 
 pub use client::EthHttpClient;
 
-mod eth_state;
 mod client;
+mod eth_state;
 
 /// Ethereum Watcher operating mode.
 ///

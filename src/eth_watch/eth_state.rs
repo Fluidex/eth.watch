@@ -22,27 +22,27 @@ pub struct ETHState {
 }
 
 impl ETHState {
-//     pub fn new(
-//         last_ethereum_block: u64,
-//         unconfirmed_queue: Vec<PriorityOp>,
-//         priority_queue: HashMap<SerialId, ReceivedPriorityOp>,
-//     ) -> Self {
-//         Self {
-//             last_ethereum_block,
-//             unconfirmed_queue,
-//             priority_queue,
-//         }
-//     }
+    pub fn new(
+        last_ethereum_block: u64,
+        // unconfirmed_queue: Vec<PriorityOp>,
+        // priority_queue: HashMap<SerialId, ReceivedPriorityOp>,
+    ) -> Self {
+        Self {
+            last_ethereum_block,
+            // unconfirmed_queue,
+            // priority_queue,
+        }
+    }
 
     pub fn last_ethereum_block(&self) -> u64 {
         self.last_ethereum_block
     }
 
-//     pub fn priority_queue(&self) -> &HashMap<u64, ReceivedPriorityOp> {
-//         &self.priority_queue
-//     }
+    //     pub fn priority_queue(&self) -> &HashMap<u64, ReceivedPriorityOp> {
+    //         &self.priority_queue
+    //     }
 
-//     pub fn unconfirmed_queue(&self) -> &[PriorityOp] {
-//         &self.unconfirmed_queue
-//     }
+    //     pub fn unconfirmed_queue(&self) -> &[PriorityOp] {
+    //         &self.unconfirmed_queue
+    //     }
 }
