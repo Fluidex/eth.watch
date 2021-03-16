@@ -6,10 +6,9 @@ use std::str::FromStr;
 // TODO:
 const FLUIDEX_CONTRACT_FILE: &str = "fluidex.json";
 
-// TODO:
-fn read_file_to_json_value(path: &str) -> io::Result<serde_json::Value> {
-    let zksync_home = std::env::var("ZKSYNC_HOME").unwrap_or_else(|_| ".".into());
-    let path = std::path::Path::new(&zksync_home).join(path);
+fn read_file_to_json_value(path: &str) -> io::Result<serde_json::Value> {	
+    let fluidex_home = std::env::var("FLUIDEX_HOME").unwrap_or_else(|_| ".".into());
+    let path = std::path::Path::new(&fluidex_home).join(path);
     let contents = fs::read_to_string(path)?;
     let val = serde_json::Value::from_str(&contents)?;
     Ok(val)
