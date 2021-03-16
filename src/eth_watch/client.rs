@@ -2,7 +2,7 @@ use crate::eth_client::ethereum_gateway::EthereumGateway;
 
 pub struct EthHttpClient {
     client: EthereumGateway,
-    contract_addr: String, // TODO: H160
+    fluidex_contract_addr: String, // TODO: H160
 }
 
 impl EthHttpClient {
@@ -15,10 +15,10 @@ impl EthHttpClient {
     //     }
     // }
 
-    pub fn new(client: EthereumGateway, contract_addr: String) -> Self {
+    pub fn new(client: EthereumGateway, fluidex_contract_addr: String) -> Self {
         Self {
             client,
-            contract_addr,
+            fluidex_contract_addr,
         }
     }
 }
