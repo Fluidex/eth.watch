@@ -28,7 +28,9 @@ impl ContractTopics {
 }
 
 #[async_trait::async_trait]
-pub trait EthClient {}
+pub trait EthClient {
+    async fn block_number(&self) -> anyhow::Result<u64>;
+}
 
 pub struct EthHttpClient {
     client: EthereumGateway,
@@ -51,4 +53,8 @@ impl EthHttpClient {
 
 // TODO:
 #[async_trait::async_trait]
-impl EthClient for EthHttpClient {}
+impl EthClient for EthHttpClient {
+    async fn block_number(&self) -> anyhow::Result<u64> {
+        Ok(self.client.block_number().await?.as_u64())
+    }
+}
