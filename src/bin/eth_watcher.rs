@@ -5,6 +5,8 @@ use tokio::{runtime::Runtime, time};
 
 use eth_watcher::config;
 use eth_watcher::eth_client::EthereumGateway;
+// use eth_watcher::eth_watch::{EthHttpClient, EthWatch, EthWatchRequest};
+use eth_watcher::eth_watch::EthHttpClient;
 
 fn main() {
     let mut main_runtime = Runtime::new().expect("main runtime start");
