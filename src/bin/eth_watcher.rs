@@ -20,6 +20,7 @@ fn main() {
     log::info!("{:?}", settings);
 
     // let client = EthereumGateway::from_config(&config);
+    let client = EthereumGateway::from_config();
 
     // let (eth_req_sender, eth_req_receiver) = mpsc::channel(256);
 
