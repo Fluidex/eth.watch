@@ -1,29 +1,51 @@
+use std::{convert::TryFrom, time::Instant};
+use std::fmt::Debug;
+
+use anyhow::format_err;
+use ethabi::Hash;
+use web3::{
+    contract::Options,
+    types::{BlockNumber, FilterBuilder, Log},
+};
+
+use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
+
+struct ContractTopics {
+    new_priority_request: Hash,
+}
+
+impl ContractTopics {
+    fn new(fluidex_contract: &ethabi::Contract) -> Self {
+        Self {
+            new_priority_request: fluidex_contract
+                .event("NewPriorityRequest")
+                .expect("main contract abi error")
+                .signature(),
+        }
+    }
+}
 
 #[async_trait::async_trait]
 pub trait EthClient {}
 
 pub struct EthHttpClient {
     client: EthereumGateway,
+    topics: ContractTopics,
     fluidex_contract_addr: String, // TODO: H160
 }
 
 impl EthHttpClient {
-    // pub fn new(client: EthereumGateway, zksync_contract_addr: H160) -> Self {
-    //     let topics = ContractTopics::new(&zksync_contract());
-    //     Self {
-    //         client,
-    //         topics,
-    //         zksync_contract_addr,
-    //     }
-    // }
-
     pub fn new(client: EthereumGateway, fluidex_contract_addr: String) -> Self {
+        let topics = ContractTopics::new(&fluidex_contract());
         Self {
             client,
+            topics,
             fluidex_contract_addr,
         }
     }
+
+    // TODO: other functions
 }
 
 #[async_trait::async_trait]
