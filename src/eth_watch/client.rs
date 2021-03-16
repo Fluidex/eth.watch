@@ -49,6 +49,6 @@ impl EthHttpClient {
     // TODO: other functions
 }
 
-// TODO: 
+// TODO:
 #[async_trait::async_trait]
 impl EthClient for EthHttpClient {}

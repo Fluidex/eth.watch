@@ -28,6 +28,10 @@ pub use client::EthHttpClient;
 mod client;
 mod eth_state;
 
+/// As `infura` may limit the requests, upon error we need to wait for a while
+/// before repeating the request.
+const RATE_LIMIT_DELAY: Duration = Duration::from_secs(30);
+
 /// Ethereum Watcher operating mode.
 ///
 /// Normally Ethereum watcher will always poll the Ethereum node upon request,
