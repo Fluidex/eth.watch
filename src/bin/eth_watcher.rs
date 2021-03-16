@@ -18,13 +18,14 @@ fn main() {
     let mut conf = config_rs::Config::new();
     let config_file = dotenv::var("CONFIG_FILE").unwrap();
     conf.merge(config_rs::File::with_name(&config_file)).unwrap();
-    let mut settings: config::Settings = conf.try_into().unwrap();
-    // log::info!("{:?}", settings);
+    let settings: config::Settings = conf.try_into().unwrap();
+    log::debug!("{:?}", settings);
 
     let client = EthereumGateway::from_config(&settings);
 
     // let (eth_req_sender, eth_req_receiver) = mpsc::channel(256);
 
+    let eth_client = EthHttpClient::new(client);
     // let eth_client = EthHttpClient::new(client, config.contracts.contract_addr);
     // let watcher = EthWatch::new(eth_client, 0);
 

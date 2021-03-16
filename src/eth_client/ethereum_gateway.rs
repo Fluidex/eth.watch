@@ -8,14 +8,13 @@ use crate::config;
 
 #[derive(Debug, Clone)]
 pub enum EthereumGateway {
-    // Direct(ETHDirectClient<PrivateKeySigner>),
-    // Multiplexed(MultiplexerEthereumClient),
-    // Mock(MockEthereum),
+    // TODO:
     Mock,
 }
 
 impl EthereumGateway {
     pub fn from_config(config: &config::Settings) -> Self {
-        EthereumGateway::Mock
+    	// TODO:
+        Self::Mock
     }
 }
