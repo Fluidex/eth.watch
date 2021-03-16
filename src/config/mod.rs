@@ -1,15 +1,12 @@
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-pub use crate::config::configs::{
-	// TODO:
-	ContractsConfig
-};
+pub use crate::config::configs::ContractsConfig;
 
 pub mod configs;
 
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 pub struct Settings {
-	// TODO:
+    // TODO:
     pub contracts: ContractsConfig,
 }

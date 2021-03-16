@@ -14,7 +14,7 @@ pub enum EthereumGateway {
 
 impl EthereumGateway {
     pub fn from_config(config: &config::Settings) -> Self {
-    	// TODO:
+        // TODO:
         Self::Mock
     }
 }
