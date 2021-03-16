@@ -4,6 +4,7 @@ use futures::{channel::mpsc, SinkExt};
 use tokio::{runtime::Runtime, time};
 
 use eth_watcher::config;
+use eth_watcher::eth_client::EthereumGateway;
 
 fn main() {
     let mut main_runtime = Runtime::new().expect("main runtime start");
@@ -16,7 +17,7 @@ fn main() {
     let config_file = dotenv::var("CONFIG_FILE").unwrap();
     conf.merge(config_rs::File::with_name(&config_file)).unwrap();
     let mut settings: config::Settings = conf.try_into().unwrap();
-    // log::info!("{:?}", settings);
+    log::info!("{:?}", settings);
 
     // let client = EthereumGateway::from_config(&config);
 
