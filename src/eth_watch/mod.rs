@@ -1,8 +1,24 @@
+//! Ethereum watcher polls the Ethereum node for new events
+//! such as PriorityQueue events or NewToken events.
+//! New events are accepted to the fluidex network once they have the sufficient amount of confirmations.
+//!
+//! Poll interval is configured using the `ETH_POLL_INTERVAL` constant.
+//! Number of confirmations is configured using the `CONFIRMATIONS_FOR_ETH_EVENT` environment variable.
+
+// Built-in deps
+use std::{
+    collections::HashMap,
+    time::{Duration, Instant},
+};
+
 // External uses
 use futures::{
     channel::{mpsc, oneshot},
     SinkExt, StreamExt,
 };
+
+use tokio::{task::JoinHandle, time};
+use web3::types::{Address, BlockNumber};
 
 // Local deps
 use self::client::EthClient;
@@ -10,6 +26,21 @@ use self::client::EthClient;
 pub use client::EthHttpClient;
 
 mod client;
+
+/// Ethereum Watcher operating mode.
+///
+/// Normally Ethereum watcher will always poll the Ethereum node upon request,
+/// but unfortunately `infura` may decline requests if they are produced too
+/// often. Thus, upon receiving the order to limit amount of request, Ethereum
+/// watcher goes into "backoff" mode in which polling is disabled for a
+/// certain amount of time.
+#[derive(Debug)]
+enum WatcherMode {
+    /// ETHWatcher operates normally.
+    Working,
+    /// Polling is currently disabled.
+    Backoff(Instant),
+}
 
 // TODO:
 #[derive(Debug)]
