@@ -120,5 +120,93 @@ impl<W: EthClient> EthWatch<W> {
     }
 
     // TODO:
-    pub async fn run(mut self, mut eth_watch_req: mpsc::Receiver<EthWatchRequest>) {}
+    pub async fn run(mut self, mut eth_watch_req: mpsc::Receiver<EthWatchRequest>) {
+        // As infura may be not responsive, we want to retry the query until we've actually got the
+        // block number.
+        // Normally, however, this loop is not expected to last more than one iteration.
+        let block = loop {
+            let block = self.client.block_number().await;
+
+            match block {
+                Ok(block) => {
+                    break block;
+                }
+                Err(error) => {
+                    vlog::warn!(
+                        "Unable to fetch last block number: '{}'. Retrying again in {} seconds",
+                        error,
+                        RATE_LIMIT_DELAY.as_secs()
+                    );
+
+                    time::delay_for(RATE_LIMIT_DELAY).await;
+                }
+            }
+        };
+
+        // Code above is prepared for the possible rate limiting by `infura`, and will wait until we
+        // can interact with the node again. We're not expecting the rate limiting to be applied
+        // immediately after that, thus any error on this stage is considered critical and
+        // irrecoverable.
+        self.restore_state_from_eth(block)
+            .await
+            .expect("Unable to restore ETHWatcher state");
+
+        while let Some(request) = eth_watch_req.next().await {
+            match request {
+                EthWatchRequest::PollETHNode => {
+                    if !self.polling_allowed() {
+                        // Polling is currently disabled, skip it.
+                        continue;
+                    }
+
+                    let poll_result = self.poll_eth_node().await;
+
+                    if let Err(error) = poll_result {
+                        if self.is_backoff_requested(&error) {
+                            vlog::warn!(
+                                "Rate limit was reached, as reported by Ethereum node. \
+                                Entering the backoff mode"
+                            );
+                            self.enter_backoff_mode();
+                        } else {
+                            // Some unexpected kind of error, we won't shutdown the node because of it,
+                            // but rather expect node administrators to handle the situation.
+                            vlog::error!("Failed to process new blocks {}", error);
+                        }
+                    }
+                }
+                EthWatchRequest::GetPriorityQueueOps {
+                    op_start_id,
+                    max_chunks,
+                    resp,
+                } => {
+                    resp.send(self.get_priority_requests(op_start_id, max_chunks)).unwrap_or_default();
+                }
+                EthWatchRequest::GetUnconfirmedDeposits { address, resp } => {
+                    let deposits_for_address = self.get_ongoing_deposits_for(address);
+                    resp.send(deposits_for_address).ok();
+                }
+                EthWatchRequest::GetUnconfirmedOps { address, resp } => {
+                    let deposits_for_address = self.get_ongoing_ops_for(address);
+                    resp.send(deposits_for_address).ok();
+                }
+                EthWatchRequest::GetUnconfirmedOpByHash { eth_hash, resp } => {
+                    let unconfirmed_op = self.find_ongoing_op_by_hash(&eth_hash);
+                    resp.send(unconfirmed_op).unwrap_or_default();
+                }
+                EthWatchRequest::IsPubkeyChangeAuthorized {
+                    address,
+                    nonce,
+                    pubkey_hash,
+                    resp,
+                } => {
+                    let authorized = self
+                        .is_new_pubkey_hash_authorized(address, nonce, &pubkey_hash)
+                        .await
+                        .unwrap_or(false);
+                    resp.send(authorized).unwrap_or_default();
+                }
+            }
+        }
+    }
 }
