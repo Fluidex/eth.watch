@@ -1,7 +1,4 @@
 // Public re-exports
-pub use self::{
-	// TODO:
-	contracts::ContractsConfig
-};
+pub use self::contracts::ContractsConfig;
 
 pub mod contracts;
