@@ -1,5 +1,8 @@
 use crate::eth_client::ethereum_gateway::EthereumGateway;
 
+#[async_trait::async_trait]
+pub trait EthClient {}
+
 pub struct EthHttpClient {
     client: EthereumGateway,
     fluidex_contract_addr: String, // TODO: H160
@@ -22,3 +25,6 @@ impl EthHttpClient {
         }
     }
 }
+
+#[async_trait::async_trait]
+impl EthClient for EthHttpClient {}

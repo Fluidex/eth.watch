@@ -4,13 +4,17 @@ use futures::{
     SinkExt, StreamExt,
 };
 
-mod client;
+// Local deps
+use self::client::EthClient;
+
 pub use client::EthHttpClient;
+
+mod client;
 
 // TODO:
 #[derive(Debug)]
 pub enum EthWatchRequest {
-	PollETHNode
+    PollETHNode,
 }
 
 // pub struct EthWatch<W: EthClient> {
@@ -32,15 +36,14 @@ pub enum EthWatchRequest {
 //     }
 // }
 
-pub struct EthWatch {
-    client: EthHttpClient,
+pub struct EthWatch<W: EthClient> {
+    client: W,
     /// All ethereum events are accepted after sufficient confirmations to eliminate risk of block reorg.
     number_of_confirmations_for_event: u64,
 }
 
-// impl<W: EthClient> EthWatch<W> {
-impl EthWatch {
-    pub fn new(client: EthHttpClient, number_of_confirmations_for_event: u64) -> Self {
+impl<W: EthClient> EthWatch<W> {
+    pub fn new(client: W, number_of_confirmations_for_event: u64) -> Self {
         Self {
             client,
             number_of_confirmations_for_event,
