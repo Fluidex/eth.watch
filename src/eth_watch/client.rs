@@ -10,6 +10,7 @@ use web3::{
 
 use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
+use crate::types::{Address, H160, U256};
 
 struct ContractTopics {
     new_priority_request: Hash,
@@ -32,11 +33,11 @@ pub trait EthClient {}
 pub struct EthHttpClient {
     client: EthereumGateway,
     topics: ContractTopics,
-    fluidex_contract_addr: String, // TODO: H160
+    fluidex_contract_addr: H160,
 }
 
 impl EthHttpClient {
-    pub fn new(client: EthereumGateway, fluidex_contract_addr: String) -> Self {
+    pub fn new(client: EthereumGateway, fluidex_contract_addr: H160) -> Self {
         let topics = ContractTopics::new(&fluidex_contract());
         Self {
             client,
