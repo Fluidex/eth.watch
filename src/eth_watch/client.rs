@@ -1,5 +1,5 @@
-use std::{convert::TryFrom, time::Instant};
 use std::fmt::Debug;
+use std::{convert::TryFrom, time::Instant};
 
 use anyhow::format_err;
 use ethabi::Hash;
