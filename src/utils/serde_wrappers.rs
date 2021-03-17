@@ -32,10 +32,7 @@ impl UnsignedRatioSerializeAsDecimal {
     }
 
     pub fn serialize_to_str_with_dot(num: &Ratio<BigUint>, precision: usize) -> String {
-        ratio_to_big_decimal(num, precision)
-            .to_string()
-            .trim_end_matches('0')
-            .to_string()
+        ratio_to_big_decimal(num, precision).to_string().trim_end_matches('0').to_string()
     }
 }
 
@@ -58,12 +55,8 @@ impl BigUintSerdeAsRadix10Str {
     {
         use serde::de::Error;
         BigDecimal::deserialize(deserializer).and_then(|bigdecimal| {
-            let big_int = bigdecimal
-                .to_bigint()
-                .ok_or_else(|| Error::custom("Expected integer value"))?;
-            big_int
-                .to_biguint()
-                .ok_or_else(|| Error::custom("Expected positive value"))
+            let big_int = bigdecimal.to_bigint().ok_or_else(|| Error::custom("Expected integer value"))?;
+            big_int.to_biguint().ok_or_else(|| Error::custom("Expected positive value"))
         })
     }
 }
@@ -134,10 +127,7 @@ impl<P: Prefix> BytesToHexSerde<P> {
         if let Some(deserialized_string) = deserialized_string.strip_prefix(P::prefix()) {
             hex::decode(&deserialized_string).map_err(de::Error::custom)
         } else {
-            Err(de::Error::custom(format!(
-                "string value missing prefix: {:?}",
-                P::prefix()
-            )))
+            Err(de::Error::custom(format!("string value missing prefix: {:?}", P::prefix())))
         }
     }
 }
@@ -157,9 +147,7 @@ impl<P: Prefix> OptionBytesToHexSerde<P> {
         S: Serializer,
     {
         // First, serialize to hexadecimal string.
-        let hex_value = value
-            .as_ref()
-            .map(|val| format!("{}{}", P::prefix(), hex::encode(val)));
+        let hex_value = value.as_ref().map(|val| format!("{}{}", P::prefix(), hex::encode(val)));
 
         // Then, serialize it using `Serialize` trait implementation for `String`.
         Option::serialize(&hex_value, serializer)
@@ -178,10 +166,7 @@ impl<P: Prefix> OptionBytesToHexSerde<P> {
                 if let Some(hex_str) = s.strip_prefix(P::prefix()) {
                     hex::decode(hex_str).map_err(de::Error::custom)
                 } else {
-                    Err(de::Error::custom(format!(
-                        "string value missing prefix: {:?}",
-                        P::prefix()
-                    )))
+                    Err(de::Error::custom(format!("string value missing prefix: {:?}", P::prefix())))
                 }
             })
             .transpose()
@@ -196,19 +181,12 @@ mod test {
     #[test]
     fn test_ratio_serialize_as_decimal() {
         #[derive(Clone, Serialize, Deserialize)]
-        struct RatioSerdeWrapper(
-            #[serde(with = "UnsignedRatioSerializeAsDecimal")] pub Ratio<BigUint>,
-        );
+        struct RatioSerdeWrapper(#[serde(with = "UnsignedRatioSerializeAsDecimal")] pub Ratio<BigUint>);
         // It's essential that this number is a finite decimal, otherwise the precision will be lost
         // and the assertion will fail.
-        let expected = RatioSerdeWrapper(Ratio::new(
-            BigUint::from(120315391195132u64),
-            BigUint::from(1250000000u64),
-        ));
-        let value =
-            serde_json::to_value(expected.clone()).expect("cannot serialize Ratio as Decimal");
-        let ratio: RatioSerdeWrapper =
-            serde_json::from_value(value).expect("cannot deserialize Ratio from Decimal");
+        let expected = RatioSerdeWrapper(Ratio::new(BigUint::from(120315391195132u64), BigUint::from(1250000000u64)));
+        let value = serde_json::to_value(expected.clone()).expect("cannot serialize Ratio as Decimal");
+        let ratio: RatioSerdeWrapper = serde_json::from_value(value).expect("cannot deserialize Ratio from Decimal");
         assert_eq!(expected.0, ratio.0);
     }
 
@@ -218,8 +196,7 @@ mod test {
         let expected = BigUint::from(u64::MAX);
         let wrapper = BigUintSerdeWrapper::from(expected.clone());
         let value = serde_json::to_value(wrapper).expect("cannot serialize BigUintSerdeWrapper");
-        let uint: BigUintSerdeWrapper =
-            serde_json::from_value(value).expect("cannot deserialize BigUintSerdeWrapper");
+        let uint: BigUintSerdeWrapper = serde_json::from_value(value).expect("cannot deserialize BigUintSerdeWrapper");
         assert_eq!(uint.0, expected);
     }
 }

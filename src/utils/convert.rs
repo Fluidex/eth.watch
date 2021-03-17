@@ -7,9 +7,7 @@ use num::{
 };
 
 pub fn ratio_to_big_decimal(num: &Ratio<BigUint>, precision: usize) -> BigDecimal {
-    let bigint = round_precision_raw_no_div(num, precision)
-        .to_bigint()
-        .unwrap();
+    let bigint = round_precision_raw_no_div(num, precision).to_bigint().unwrap();
     BigDecimal::new(bigint, precision as i64)
 }
 
