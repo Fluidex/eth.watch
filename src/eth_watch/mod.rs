@@ -20,7 +20,8 @@ use futures::{
 use tokio::{task::JoinHandle, time};
 use web3::types::{Address, BlockNumber};
 
-// Local deps
+use crate::types::{Nonce, PriorityOp, PubKeyHash /*ZkSyncPriorityOp*/};
+
 use self::{client::EthClient, eth_state::ETHState};
 
 pub use client::EthHttpClient;
@@ -47,10 +48,32 @@ enum WatcherMode {
     Backoff(Instant),
 }
 
-// TODO:
 #[derive(Debug)]
 pub enum EthWatchRequest {
     PollETHNode,
+    IsPubkeyChangeAuthorized {
+        address: Address,
+        nonce: Nonce,
+        pubkey_hash: PubKeyHash,
+        resp: oneshot::Sender<bool>,
+    },
+    GetPriorityQueueOps {
+        op_start_id: u64,
+        max_chunks: usize,
+        resp: oneshot::Sender<Vec<PriorityOp>>,
+    },
+    GetUnconfirmedDeposits {
+        address: Address,
+        resp: oneshot::Sender<Vec<PriorityOp>>,
+    },
+    GetUnconfirmedOps {
+        address: Address,
+        resp: oneshot::Sender<Vec<PriorityOp>>,
+    },
+    GetUnconfirmedOpByHash {
+        eth_hash: Vec<u8>,
+        resp: oneshot::Sender<Option<PriorityOp>>,
+    },
 }
 
 pub struct EthWatch<W: EthClient> {

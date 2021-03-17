@@ -1,8 +1,9 @@
+pub mod account;
 pub mod priority_ops;
-pub mod utils;
+mod utils;
 
-pub use crate::basic_types::*;
-
+pub use self::account::PubKeyHash;
 pub use self::priority_ops::{Deposit, FluidexPriorityOp, FullExit, PriorityOp};
+pub use crate::basic_types::*;
 
 pub type SerialId = u64;
