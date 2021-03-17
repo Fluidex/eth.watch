@@ -8,6 +8,34 @@ use crate::config;
 use crate::types::{/*TransactionReceipt,*/ H160, H256, U256};
 use crate::eth_client::clients::mock::MockEthereum;
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct SignedCallResult {
+    pub raw_tx: Vec<u8>,
+    pub gas_price: U256,
+    pub nonce: U256,
+    pub hash: H256,
+}
+
+/// State of the executed Ethereum transaction.
+#[derive(Debug, Clone)]
+pub struct ExecutedTxStatus {
+    /// Amount of confirmations for a block containing the transaction.
+    pub confirmations: u64,
+    /// Whether transaction was executed successfully or failed.
+    pub success: bool,
+    /// Receipt for a transaction. Will be set to `Some` only if the transaction
+    /// failed during execution.
+    pub receipt: Option<TransactionReceipt>,
+}
+/// Information about transaction failure.
+#[derive(Debug, Clone)]
+pub struct FailureInfo {
+    pub revert_code: String,
+    pub revert_reason: String,
+    pub gas_used: Option<U256>,
+    pub gas_limit: U256,
+}
+
 #[derive(Debug, Clone)]
 pub enum EthereumGateway {
     // TODO:
