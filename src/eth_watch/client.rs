@@ -10,7 +10,7 @@ use web3::{
 
 use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
-use crate::types::{Address, Nonce, /* PriorityOp,*/ H160, U256};
+use crate::types::{Address, Nonce, PriorityOp, H160, U256};
 
 struct ContractTopics {
     new_priority_request: Hash,
@@ -29,11 +29,7 @@ impl ContractTopics {
 
 #[async_trait::async_trait]
 pub trait EthClient {
-    // async fn get_priority_op_events(
-    //     &self,
-    //     from: BlockNumber,
-    //     to: BlockNumber,
-    // ) -> anyhow::Result<Vec<PriorityOp>>;
+    async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
     async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>>;
     async fn get_auth_fact_reset_time(&self, address: Address, nonce: Nonce) -> anyhow::Result<u64>;
@@ -86,19 +82,13 @@ impl EthHttpClient {
 
 #[async_trait::async_trait]
 impl EthClient for EthHttpClient {
-    // async fn get_priority_op_events(
-    //     &self,
-    //     from: BlockNumber,
-    //     to: BlockNumber,
-    // ) -> anyhow::Result<Vec<PriorityOp>> {
-    //     let start = Instant::now();
+    async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
+        let start = Instant::now();
 
-    //     let result = self
-    //         .get_events(from, to, vec![self.topics.new_priority_request])
-    //         .await;
-    //     metrics::histogram!("eth_watcher.get_priority_op_events", start.elapsed());
-    //     result
-    // }
+        let result = self.get_events(from, to, vec![self.topics.new_priority_request]).await;
+        // metrics::histogram!("eth_watcher.get_priority_op_events", start.elapsed());
+        result
+    }
 
     async fn block_number(&self) -> anyhow::Result<u64> {
         Ok(self.client.block_number().await?.as_u64())
