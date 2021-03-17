@@ -7,8 +7,11 @@ use super::{
 };
 use crate::basic_types::{Address, Log, H256, U256};
 use crate::utils::BigUintSerdeAsRadix10Str;
+use anyhow::{bail, ensure, format_err};
+use ethabi::{decode, ParamType};
 use num::{BigUint, ToPrimitive};
 use serde::{Deserialize, Serialize};
+use std::convert::{TryFrom, TryInto};
 
 /// Deposit priority operation transfers funds from the L1 account to the desired L2 account.
 /// If the target L2 account didn't exist at the moment of the operation execution, a new
@@ -57,4 +60,12 @@ pub struct PriorityOp {
     pub eth_hash: H256,
     /// Block in which Ethereum transaction was included.
     pub eth_block: u64,
+}
+
+impl TryFrom<Log> for PriorityOp {
+    type Error = anyhow::Error;
+
+    fn try_from(event: Log) -> Result<PriorityOp, anyhow::Error> {
+        unimplemented!();
+    }
 }
