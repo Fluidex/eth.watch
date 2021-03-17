@@ -36,8 +36,7 @@ pub trait EthClient {
     // ) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
     async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>>;
-    async fn get_auth_fact_reset_time(&self, address: Address, nonce: Nonce)
-        -> anyhow::Result<u64>;
+    async fn get_auth_fact_reset_time(&self, address: Address, nonce: Nonce) -> anyhow::Result<u64>;
 }
 
 pub struct EthHttpClient {
@@ -56,12 +55,7 @@ impl EthHttpClient {
         }
     }
 
-    async fn get_events<T>(
-        &self,
-        from: BlockNumber,
-        to: BlockNumber,
-        topics: Vec<Hash>,
-    ) -> anyhow::Result<Vec<T>>
+    async fn get_events<T>(&self, from: BlockNumber, to: BlockNumber, topics: Vec<Hash>) -> anyhow::Result<Vec<T>>
     where
         T: TryFrom<Log>,
         T::Error: Debug,
@@ -112,30 +106,14 @@ impl EthClient for EthHttpClient {
 
     async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>> {
         self.client
-            .call_main_contract_function(
-                "authFacts",
-                (address, u64::from(*nonce)),
-                None,
-                Options::default(),
-                None,
-            )
+            .call_main_contract_function("authFacts", (address, u64::from(*nonce)), None, Options::default(), None)
             .await
             .map_err(|e| format_err!("Failed to query contract authFacts: {}", e))
     }
 
-    async fn get_auth_fact_reset_time(
-        &self,
-        address: Address,
-        nonce: Nonce,
-    ) -> anyhow::Result<u64> {
+    async fn get_auth_fact_reset_time(&self, address: Address, nonce: Nonce) -> anyhow::Result<u64> {
         self.client
-            .call_main_contract_function(
-                "authFactsResetTimer",
-                (address, u64::from(*nonce)),
-                None,
-                Options::default(),
-                None,
-            )
+            .call_main_contract_function("authFactsResetTimer", (address, u64::from(*nonce)), None, Options::default(), None)
             .await
             .map_err(|e| format_err!("Failed to query contract authFacts: {}", e))
             .map(|res: U256| res.as_u64())

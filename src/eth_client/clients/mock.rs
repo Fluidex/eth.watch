@@ -8,11 +8,11 @@ use web3::contract::tokens::{Detokenize, Tokenize};
 use web3::contract::Options;
 use web3::types::{BlockId, Filter, Log, U64};
 
-use crate::types::{TransactionReceipt, H160, H256, U256};
 use crate::eth_client::{
     ethereum_gateway::{ExecutedTxStatus, FailureInfo},
     SignedCallResult,
 };
+use crate::types::{TransactionReceipt, H160, H256, U256};
 
 /// Mock Ethereum client is capable of recording all the incoming requests for the further analysis.
 #[derive(Debug, Clone)]
@@ -106,11 +106,7 @@ impl MockEthereum {
         Ok(H256::from(hash))
     }
 
-    pub async fn sign_prepared_tx(
-        &self,
-        raw_tx: Vec<u8>,
-        options: Options,
-    ) -> anyhow::Result<SignedCallResult> {
+    pub async fn sign_prepared_tx(&self, raw_tx: Vec<u8>, options: Options) -> anyhow::Result<SignedCallResult> {
         let gas_price = options.gas_price.unwrap_or(self.gas_price);
         let nonce = options.nonce.expect("Nonce must be set for every tx");
 
@@ -131,10 +127,7 @@ impl MockEthereum {
         })
     }
 
-    pub async fn failure_reason(
-        &self,
-        _tx_hash: H256,
-    ) -> Result<Option<FailureInfo>, anyhow::Error> {
+    pub async fn failure_reason(&self, _tx_hash: H256) -> Result<Option<FailureInfo>, anyhow::Error> {
         Ok(None)
     }
 
@@ -167,20 +160,11 @@ impl MockEthereum {
         unreachable!()
     }
 
-    pub async fn contract_balance(
-        &self,
-        _token_address: Address,
-        _abi: Contract,
-        _address: Address,
-    ) -> Result<U256, Error> {
+    pub async fn contract_balance(&self, _token_address: Address, _abi: Contract, _address: Address) -> Result<U256, Error> {
         unreachable!()
     }
 
-    pub async fn allowance(
-        &self,
-        _token_address: Address,
-        _erc20_abi: Contract,
-    ) -> Result<U256, Error> {
+    pub async fn allowance(&self, _token_address: Address, _erc20_abi: Contract) -> Result<U256, Error> {
         unreachable!()
     }
     pub fn contract(&self) -> &Contract {
