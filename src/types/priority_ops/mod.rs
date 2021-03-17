@@ -1,12 +1,14 @@
-use serde::{Deserialize, Serialize};
-use num::{BigUint, ToPrimitive};
-use crate::utils::BigUintSerdeAsRadix10Str;
-use crate::basic_types::{Address, Log, H256, U256};
 use super::{
     // operations::{DepositOp, FullExitOp},
     utils::h256_as_vec,
-    AccountId, SerialId, TokenId,
+    AccountId,
+    SerialId,
+    TokenId,
 };
+use crate::basic_types::{Address, Log, H256, U256};
+use crate::utils::BigUintSerdeAsRadix10Str;
+use num::{BigUint, ToPrimitive};
+use serde::{Deserialize, Serialize};
 
 /// Deposit priority operation transfers funds from the L1 account to the desired L2 account.
 /// If the target L2 account didn't exist at the moment of the operation execution, a new
@@ -40,7 +42,6 @@ pub enum FluidexPriorityOp {
     Deposit(Deposit),
     FullExit(FullExit),
 }
-
 
 /// Priority operation description with the metadata required for server to process it.
 #[derive(Debug, Clone, Serialize, Deserialize)]

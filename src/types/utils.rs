@@ -7,8 +7,8 @@ use serde::{
     Deserialize, Deserializer,
 };
 
-use crate::utils::format_units;
 use crate::basic_types::Address;
+use crate::utils::format_units;
 
 /// Deserializes either a `String` or `Vec<u8>` into `Vec<u8>`.
 /// The reason we cannot expect just a vector is backward compatibility: messages
@@ -50,9 +50,9 @@ where
 /// with the old serialize/deserialize behaviour of the fields
 /// whose type changed from `Vec<u8>` to `H256`.
 pub mod h256_as_vec {
+    use crate::basic_types::H256;
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
     use std::iter;
-    use crate::basic_types::H256;
 
     pub fn serialize<S>(val: &H256, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -109,14 +109,7 @@ pub fn ethereum_sign_message_part(
         if !message.is_empty() {
             message.push('\n');
         }
-        message.push_str(
-            format!(
-                "Fee: {fee} {token}",
-                fee = format_units(fee, decimals),
-                token = token_symbol
-            )
-            .as_str(),
-        );
+        message.push_str(format!("Fee: {fee} {token}", fee = format_units(fee, decimals), token = token_symbol).as_str());
     }
     message
 }
