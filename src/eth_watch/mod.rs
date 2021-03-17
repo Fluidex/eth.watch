@@ -99,23 +99,17 @@ impl<W: EthClient> EthWatch<W> {
         self.eth_state = new_state;
     }
 
-    async fn get_unconfirmed_ops(
-        &mut self,
-        current_ethereum_block: u64,
-    ) -> anyhow::Result<Vec<PriorityOp>> {
+    async fn get_unconfirmed_ops(&mut self, current_ethereum_block: u64) -> anyhow::Result<Vec<PriorityOp>> {
         // We want to scan the interval of blocks from the latest one up to the oldest one which may
         // have unconfirmed priority ops.
         // `+ 1` is added because if we subtract number of confirmations, we'll obtain the last block
         // which has operations that must be processed. So, for the unconfirmed operations, we must
         // start from the block next to it.
-        let block_from_number =
-            current_ethereum_block.saturating_sub(self.number_of_confirmations_for_event) + 1;
+        let block_from_number = current_ethereum_block.saturating_sub(self.number_of_confirmations_for_event) + 1;
         let block_from = BlockNumber::Number(block_from_number.into());
         let block_to = BlockNumber::Latest;
 
-        self.client
-            .get_priority_op_events(block_from, block_to)
-            .await
+        self.client.get_priority_op_events(block_from, block_to).await
     }
 
     async fn process_new_blocks(&mut self, last_ethereum_block: u64) -> anyhow::Result<()> {
@@ -126,12 +120,9 @@ impl<W: EthClient> EthWatch<W> {
         // Note that we don't have to add `number_of_confirmations_for_event` here, because the check function takes
         // care of it on its own. Here we calculate "how many blocks should we watch", and the offsets with respect
         // to the `number_of_confirmations_for_event` are calculated by `update_eth_state`.
-        let block_difference =
-            last_ethereum_block.saturating_sub(self.eth_state.last_ethereum_block());
+        let block_difference = last_ethereum_block.saturating_sub(self.eth_state.last_ethereum_block());
 
-        let (unconfirmed_queue, received_priority_queue) = self
-            .update_eth_state(last_ethereum_block, block_difference)
-            .await?;
+        let (unconfirmed_queue, received_priority_queue) = self.update_eth_state(last_ethereum_block, block_difference).await?;
 
         // Extend the existing priority operations with the new ones.
         let mut priority_queue = sift_outdated_ops(self.eth_state.priority_queue());
@@ -145,9 +136,7 @@ impl<W: EthClient> EthWatch<W> {
     }
 
     async fn restore_state_from_eth(&mut self, last_ethereum_block: u64) -> anyhow::Result<()> {
-        let (unconfirmed_queue, priority_queue) = self
-            .update_eth_state(last_ethereum_block, PRIORITY_EXPIRATION)
-            .await?;
+        let (unconfirmed_queue, priority_queue) = self.update_eth_state(last_ethereum_block, PRIORITY_EXPIRATION).await?;
 
         let new_state = ETHState::new(last_ethereum_block, unconfirmed_queue, priority_queue);
 
@@ -161,10 +150,8 @@ impl<W: EthClient> EthWatch<W> {
         current_ethereum_block: u64,
         unprocessed_blocks_amount: u64,
     ) -> anyhow::Result<(Vec<PriorityOp>, HashMap<u64, ReceivedPriorityOp>)> {
-        let new_block_with_accepted_events =
-            current_ethereum_block.saturating_sub(self.number_of_confirmations_for_event);
-        let previous_block_with_accepted_events =
-            new_block_with_accepted_events.saturating_sub(unprocessed_blocks_amount);
+        let new_block_with_accepted_events = current_ethereum_block.saturating_sub(self.number_of_confirmations_for_event);
+        let previous_block_with_accepted_events = new_block_with_accepted_events.saturating_sub(unprocessed_blocks_amount);
 
         let unconfirmed_queue = self.get_unconfirmed_ops(current_ethereum_block).await?;
         let priority_queue = self
@@ -200,12 +187,7 @@ impl<W: EthClient> EthWatch<W> {
         result
     }
 
-    async fn is_new_pubkey_hash_authorized(
-        &self,
-        address: Address,
-        nonce: Nonce,
-        pub_key_hash: &PubKeyHash,
-    ) -> anyhow::Result<bool> {
+    async fn is_new_pubkey_hash_authorized(&self, address: Address, nonce: Nonce, pub_key_hash: &PubKeyHash) -> anyhow::Result<bool> {
         let auth_fact_reset_time = self.client.get_auth_fact_reset_time(address, nonce).await?;
         if auth_fact_reset_time != 0 {
             return Ok(false);
@@ -353,8 +335,7 @@ impl<W: EthClient> EthWatch<W> {
                     max_chunks,
                     resp,
                 } => {
-                    resp.send(self.get_priority_requests(op_start_id, max_chunks))
-                        .unwrap_or_default();
+                    resp.send(self.get_priority_requests(op_start_id, max_chunks)).unwrap_or_default();
                 }
                 EthWatchRequest::GetUnconfirmedDeposits { address, resp } => {
                     let deposits_for_address = self.get_ongoing_deposits_for(address);
