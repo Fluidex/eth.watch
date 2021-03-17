@@ -5,6 +5,7 @@ use web3::contract::Options;
 use web3::types::{Address, BlockId, Filter, Log, U64};
 
 use crate::config;
+use crate::types::{/*TransactionReceipt,*/ H160, H256, U256};
 use crate::eth_client::clients::mock::MockEthereum;
 
 #[derive(Debug, Clone)]
