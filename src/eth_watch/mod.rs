@@ -163,7 +163,7 @@ impl<W: EthClient> EthWatch<W> {
 
                     if let Err(error) = poll_result {
                         if self.is_backoff_requested(&error) {
-                            vlog::warn!(
+                            log::warn!(
                                 "Rate limit was reached, as reported by Ethereum node. \
                                 Entering the backoff mode"
                             );
@@ -171,7 +171,7 @@ impl<W: EthClient> EthWatch<W> {
                         } else {
                             // Some unexpected kind of error, we won't shutdown the node because of it,
                             // but rather expect node administrators to handle the situation.
-                            vlog::error!("Failed to process new blocks {}", error);
+                            log::error!("Failed to process new blocks {}", error);
                         }
                     }
                 }
