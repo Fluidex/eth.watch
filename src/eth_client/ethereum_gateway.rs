@@ -5,16 +5,17 @@ use web3::contract::Options;
 use web3::types::{Address, BlockId, Filter, Log, U64};
 
 use crate::config;
+use crate::eth_client::clients::mock::MockEthereum;
 
 #[derive(Debug, Clone)]
 pub enum EthereumGateway {
     // TODO:
-    Mock,
+    Mock(MockEthereum),
 }
 
 impl EthereumGateway {
     pub fn from_config(config: &config::Settings) -> Self {
         // TODO:
-        Self::Mock
+        Self::Mock(MockEthereum::default())
     }
 }
