@@ -8,20 +8,18 @@ use web3::contract::tokens::{Detokenize, Tokenize};
 use web3::contract::Options;
 use web3::types::{BlockId, Filter, Log, U64};
 
-// use zksync_types::{TransactionReceipt, H160, H256, U256};
-use crate::types::{H160, H256, U256};
-
-// use crate::{
-//     ethereum_gateway::{ExecutedTxStatus, FailureInfo},
-//     SignedCallResult,
-// };
+use crate::types::{TransactionReceipt, H160, H256, U256};
+use crate::eth_client::{
+    ethereum_gateway::{ExecutedTxStatus, FailureInfo},
+    SignedCallResult,
+};
 
 /// Mock Ethereum client is capable of recording all the incoming requests for the further analysis.
 #[derive(Debug, Clone)]
 pub struct MockEthereum {
     pub block_number: u64,
     pub gas_price: U256,
-    // pub tx_statuses: Arc<RwLock<HashMap<H256, ExecutedTxStatus>>>,
+    pub tx_statuses: Arc<RwLock<HashMap<H256, ExecutedTxStatus>>>,
     pub sent_txs: Arc<RwLock<HashSet<Vec<u8>>>>,
 }
 
@@ -30,7 +28,7 @@ impl Default for MockEthereum {
         Self {
             block_number: 1,
             gas_price: 100.into(),
-            // tx_statuses: Default::default(),
+            tx_statuses: Default::default(),
             sent_txs: Default::default(),
         }
     }
@@ -59,38 +57,38 @@ impl MockEthereum {
         );
     }
 
-    // /// Adds an response for the sent transaction for `ETHSender` to receive.
-    // pub async fn add_execution(&mut self, hash: &H256, status: &ExecutedTxStatus) {
-    //     self.tx_statuses.write().await.insert(*hash, status.clone());
-    // }
+    /// Adds an response for the sent transaction for `ETHSender` to receive.
+    pub async fn add_execution(&mut self, hash: &H256, status: &ExecutedTxStatus) {
+        self.tx_statuses.write().await.insert(*hash, status.clone());
+    }
 
-    // /// Increments the blocks by a provided `confirmations` and marks the sent transaction
-    // /// as a success.
-    // pub async fn add_successfull_execution(&mut self, tx_hash: H256, confirmations: u64) {
-    //     self.block_number += confirmations;
+    /// Increments the blocks by a provided `confirmations` and marks the sent transaction
+    /// as a success.
+    pub async fn add_successfull_execution(&mut self, tx_hash: H256, confirmations: u64) {
+        self.block_number += confirmations;
 
-    //     let status = ExecutedTxStatus {
-    //         confirmations,
-    //         success: true,
-    //         receipt: None,
-    //     };
-    //     self.tx_statuses.write().await.insert(tx_hash, status);
-    // }
+        let status = ExecutedTxStatus {
+            confirmations,
+            success: true,
+            receipt: None,
+        };
+        self.tx_statuses.write().await.insert(tx_hash, status);
+    }
 
-    // /// Same as `add_successfull_execution`, but marks the transaction as a failure.
-    // pub async fn add_failed_execution(&mut self, hash: &H256, confirmations: u64) {
-    //     self.block_number += confirmations;
+    /// Same as `add_successfull_execution`, but marks the transaction as a failure.
+    pub async fn add_failed_execution(&mut self, hash: &H256, confirmations: u64) {
+        self.block_number += confirmations;
 
-    //     let status = ExecutedTxStatus {
-    //         confirmations,
-    //         success: false,
-    //         receipt: Some(Default::default()),
-    //     };
-    //     self.tx_statuses.write().await.insert(*hash, status);
-    // }
-    // pub async fn get_tx_status(&self, hash: H256) -> anyhow::Result<Option<ExecutedTxStatus>> {
-    //     Ok(self.tx_statuses.read().await.get(&hash).cloned())
-    // }
+        let status = ExecutedTxStatus {
+            confirmations,
+            success: false,
+            receipt: Some(Default::default()),
+        };
+        self.tx_statuses.write().await.insert(*hash, status);
+    }
+    pub async fn get_tx_status(&self, hash: H256) -> anyhow::Result<Option<ExecutedTxStatus>> {
+        Ok(self.tx_statuses.read().await.get(&hash).cloned())
+    }
 
     pub async fn block_number(&self) -> anyhow::Result<U64> {
         Ok(self.block_number.into())
@@ -108,37 +106,37 @@ impl MockEthereum {
         Ok(H256::from(hash))
     }
 
-    // pub async fn sign_prepared_tx(
-    //     &self,
-    //     raw_tx: Vec<u8>,
-    //     options: Options,
-    // ) -> anyhow::Result<SignedCallResult> {
-    //     let gas_price = options.gas_price.unwrap_or(self.gas_price);
-    //     let nonce = options.nonce.expect("Nonce must be set for every tx");
+    pub async fn sign_prepared_tx(
+        &self,
+        raw_tx: Vec<u8>,
+        options: Options,
+    ) -> anyhow::Result<SignedCallResult> {
+        let gas_price = options.gas_price.unwrap_or(self.gas_price);
+        let nonce = options.nonce.expect("Nonce must be set for every tx");
 
-    //     // Nonce and gas_price are appended to distinguish the same transactions
-    //     // with different gas by their hash in tests.
-    //     let mut data_for_hash = raw_tx.clone();
-    //     data_for_hash.append(&mut ethabi::encode(gas_price.into_tokens().as_ref()));
-    //     data_for_hash.append(&mut ethabi::encode(nonce.into_tokens().as_ref()));
-    //     let hash = Self::fake_sha256(data_for_hash.as_ref()); // Okay for test purposes.
-    //                                                           // Concatenate raw_tx plus hash for test purposes
-    //     let mut new_raw_tx = hash.as_bytes().to_vec();
-    //     new_raw_tx.extend(raw_tx);
-    //     Ok(SignedCallResult {
-    //         raw_tx: new_raw_tx,
-    //         gas_price,
-    //         nonce,
-    //         hash,
-    //     })
-    // }
+        // Nonce and gas_price are appended to distinguish the same transactions
+        // with different gas by their hash in tests.
+        let mut data_for_hash = raw_tx.clone();
+        data_for_hash.append(&mut ethabi::encode(gas_price.into_tokens().as_ref()));
+        data_for_hash.append(&mut ethabi::encode(nonce.into_tokens().as_ref()));
+        let hash = Self::fake_sha256(data_for_hash.as_ref()); // Okay for test purposes.
+                                                              // Concatenate raw_tx plus hash for test purposes
+        let mut new_raw_tx = hash.as_bytes().to_vec();
+        new_raw_tx.extend(raw_tx);
+        Ok(SignedCallResult {
+            raw_tx: new_raw_tx,
+            gas_price,
+            nonce,
+            hash,
+        })
+    }
 
-    // pub async fn failure_reason(
-    //     &self,
-    //     _tx_hash: H256,
-    // ) -> Result<Option<FailureInfo>, anyhow::Error> {
-    //     Ok(None)
-    // }
+    pub async fn failure_reason(
+        &self,
+        _tx_hash: H256,
+    ) -> Result<Option<FailureInfo>, anyhow::Error> {
+        Ok(None)
+    }
 
     pub async fn pending_nonce(&self) -> Result<U256, Error> {
         unreachable!()
@@ -152,18 +150,18 @@ impl MockEthereum {
         unreachable!()
     }
 
-    // pub async fn sign_prepared_tx_for_addr(
-    //     &self,
-    //     _data: Vec<u8>,
-    //     _contract_addr: H160,
-    //     _options: Options,
-    // ) -> Result<SignedCallResult, Error> {
-    //     unreachable!()
-    // }
+    pub async fn sign_prepared_tx_for_addr(
+        &self,
+        _data: Vec<u8>,
+        _contract_addr: H160,
+        _options: Options,
+    ) -> Result<SignedCallResult, Error> {
+        unreachable!()
+    }
 
-    // pub async fn tx_receipt(&self, _tx_hash: H256) -> Result<Option<TransactionReceipt>, Error> {
-    //     unreachable!()
-    // }
+    pub async fn tx_receipt(&self, _tx_hash: H256) -> Result<Option<TransactionReceipt>, Error> {
+        unreachable!()
+    }
 
     pub async fn eth_balance(&self, _address: Address) -> Result<U256, Error> {
         unreachable!()
