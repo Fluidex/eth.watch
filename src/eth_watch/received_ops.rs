@@ -1,8 +1,8 @@
+use crate::types::PriorityOp;
 use std::{
     collections::HashMap,
     time::{Duration, Instant},
 };
-use crate::types::PriorityOp;
 
 pub const SECS_IN_HOUR: u64 = 3600;
 
@@ -15,8 +15,7 @@ pub const PRIORITY_EXPIRATION_DAYS: u64 = 6;
 /// This value must be greater than `PRIORITY_EXPIRATION` constant from the
 /// `Config.sol` contract. Currently the value is 3 days (value from contract)
 /// + 2 hours (just for the safety).
-pub const PRIORITY_OP_EXPIRATION: Duration =
-    Duration::from_secs(PRIORITY_EXPIRATION_DAYS * 24 * SECS_IN_HOUR + 2 * SECS_IN_HOUR);
+pub const PRIORITY_OP_EXPIRATION: Duration = Duration::from_secs(PRIORITY_EXPIRATION_DAYS * 24 * SECS_IN_HOUR + 2 * SECS_IN_HOUR);
 
 /// Received `PriorityOp` with additional metainformation required
 /// for efficient management of the operations queue.
@@ -49,16 +48,8 @@ impl AsRef<PriorityOp> for ReceivedPriorityOp {
 
 /// Goes through provided operations queue, retaining only ones that are
 /// not outdated.
-pub fn sift_outdated_ops(
-    ops: &HashMap<u64, ReceivedPriorityOp>,
-) -> HashMap<u64, ReceivedPriorityOp> {
+pub fn sift_outdated_ops(ops: &HashMap<u64, ReceivedPriorityOp>) -> HashMap<u64, ReceivedPriorityOp> {
     ops.iter()
-        .filter_map(|(id, op)| {
-            if !op.is_outdated() {
-                Some((*id, op.clone()))
-            } else {
-                None
-            }
-        })
+        .filter_map(|(id, op)| if !op.is_outdated() { Some((*id, op.clone())) } else { None })
         .collect()
 }

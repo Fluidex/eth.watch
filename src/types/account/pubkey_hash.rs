@@ -2,8 +2,7 @@ use anyhow::ensure;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::convert::TryInto;
 
-// TODO:
-const ADDRESS_LEN: usize = 20;
+use crate::params;
 
 /// Hash of the account's owner public key.
 ///
@@ -13,7 +12,7 @@ const ADDRESS_LEN: usize = 20;
 /// `PubKeyHash` is calculated as the Rescue hash of the public key byte sequence.
 #[derive(Copy, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 pub struct PubKeyHash {
-    pub data: [u8; ADDRESS_LEN],
+    pub data: [u8; params::ADDRESS_LEN],
 }
 
 impl std::fmt::Debug for PubKeyHash {
@@ -28,7 +27,9 @@ impl PubKeyHash {
     /// set for the corresponding account.
     /// Accounts with unset `PubKeyHash` are unable to execute L2 transactions.
     pub fn zero() -> Self {
-        PubKeyHash { data: [0; ADDRESS_LEN] }
+        PubKeyHash {
+            data: [0; params::ADDRESS_LEN],
+        }
     }
 
     /// Converts the `PubKeyHash` object into its hexadecimal representation.
@@ -62,7 +63,7 @@ impl PubKeyHash {
 
     /// Decodes `PubKeyHash` from the byte sequence.
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, anyhow::Error> {
-        ensure!(bytes.len() == ADDRESS_LEN, "Size mismatch");
+        ensure!(bytes.len() == params::ADDRESS_LEN, "Size mismatch");
         Ok(PubKeyHash {
             data: bytes.try_into().unwrap(),
         })

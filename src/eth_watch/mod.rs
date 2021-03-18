@@ -20,6 +20,7 @@ use futures::{
 use tokio::{task::JoinHandle, time};
 use web3::types::{Address, BlockNumber};
 
+use crate::params;
 use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
 
 use self::{
@@ -141,7 +142,7 @@ impl<W: EthClient> EthWatch<W> {
     }
 
     async fn restore_state_from_eth(&mut self, last_ethereum_block: u64) -> anyhow::Result<()> {
-        let (unconfirmed_queue, priority_queue) = self.update_eth_state(last_ethereum_block, PRIORITY_EXPIRATION).await?;
+        let (unconfirmed_queue, priority_queue) = self.update_eth_state(last_ethereum_block, params::PRIORITY_EXPIRATION).await?;
 
         let new_state = ETHState::new(last_ethereum_block, unconfirmed_queue, priority_queue);
 
