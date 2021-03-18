@@ -20,7 +20,7 @@ use futures::{
 use tokio::{task::JoinHandle, time};
 use web3::types::{Address, BlockNumber};
 
-use crate::types::{Nonce, PriorityOp, PubKeyHash /*ZkSyncPriorityOp*/};
+use crate::types::{Nonce, PriorityOp, PubKeyHash, FluidexPriorityOp};
 
 use self::{client::EthClient, eth_state::ETHState};
 
@@ -209,7 +209,7 @@ impl<W: EthClient> EthWatch<W> {
             .unconfirmed_queue()
             .iter()
             .filter(|op| match &op.data {
-                ZkSyncPriorityOp::Deposit(deposit) => {
+                FluidexPriorityOp::Deposit(deposit) => {
                     // Address may be set to either sender or recipient.
                     deposit.from == address || deposit.to == address
                 }
@@ -224,11 +224,11 @@ impl<W: EthClient> EthWatch<W> {
             .unconfirmed_queue()
             .iter()
             .filter(|op| match &op.data {
-                ZkSyncPriorityOp::Deposit(deposit) => {
+                FluidexPriorityOp::Deposit(deposit) => {
                     // Address may be set to sender.
                     deposit.from == address
                 }
-                ZkSyncPriorityOp::FullExit(full_exit) => full_exit.eth_address == address,
+                FluidexPriorityOp::FullExit(full_exit) => full_exit.eth_address == address,
             })
             .cloned()
             .collect()
