@@ -22,12 +22,17 @@ use web3::types::{Address, BlockNumber};
 
 use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
 
-use self::{client::EthClient, eth_state::ETHState};
+use self::{
+    client::EthClient,
+    eth_state::ETHState,
+    received_ops::{sift_outdated_ops, ReceivedPriorityOp},
+};
 
 pub use client::EthHttpClient;
 
 mod client;
 mod eth_state;
+mod received_ops;
 
 /// As `infura` may limit the requests, upon error we need to wait for a while
 /// before repeating the request.
