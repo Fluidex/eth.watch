@@ -46,6 +46,13 @@ pub enum FluidexPriorityOp {
     FullExit(FullExit),
 }
 
+impl FluidexPriorityOp {
+    /// Returns the amount of chunks required to include the priority operation into the block.
+    pub fn chunks(&self) -> usize {
+        unimplemented!();
+    }
+}
+
 /// Priority operation description with the metadata required for server to process it.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriorityOp {
