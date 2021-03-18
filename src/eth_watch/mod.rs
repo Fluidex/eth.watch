@@ -20,7 +20,7 @@ use futures::{
 use tokio::{task::JoinHandle, time};
 use web3::types::{Address, BlockNumber};
 
-use crate::types::{Nonce, PriorityOp, PubKeyHash, FluidexPriorityOp};
+use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
 
 use self::{client::EthClient, eth_state::ETHState};
 
