@@ -38,29 +38,29 @@ pub struct FailureInfo {
 
 #[derive(Debug, Clone)]
 pub enum EthereumGateway {
-    // TODO:
+    Direct(ETHDirectClient<PrivateKeySigner>),
+    Multiplexed(MultiplexerEthereumClient),
     Mock(MockEthereum),
 }
 
 impl EthereumGateway {
     pub fn from_config(config: &config::Settings) -> Self {
-        // TODO:
-        Self::Mock(MockEthereum::default())
+        unimplemented!();
     }
 }
 
 macro_rules! delegate_call {
     ($self:ident.$method:ident($($args:ident),+)) => {
         match $self {
-            // Self::Direct(d) => d.$method($($args),+).await,
-            // Self::Multiplexed(d) => d.$method($($args),+).await,
+            Self::Direct(d) => d.$method($($args),+).await,
+            Self::Multiplexed(d) => d.$method($($args),+).await,
             Self::Mock(d) => d.$method($($args),+).await,
         }
     };
     ($self:ident.$method:ident()) => {
         match $self {
-            // Self::Direct(d) => d.$method().await,
-            // Self::Multiplexed(m) => m.$method().await,
+            Self::Direct(d) => d.$method().await,
+            Self::Multiplexed(m) => m.$method().await,
             Self::Mock(d) => d.$method().await,
         }
     }
@@ -100,7 +100,11 @@ impl EthereumGateway {
 
     /// Signs the transaction given the previously encoded data.
     /// Fills in gas/nonce if not supplied inside options.
-    pub async fn sign_prepared_tx(&self, data: Vec<u8>, options: Options) -> Result<SignedCallResult, anyhow::Error> {
+    pub async fn sign_prepared_tx(
+        &self,
+        data: Vec<u8>,
+        options: Options,
+    ) -> Result<SignedCallResult, anyhow::Error> {
         delegate_call!(self.sign_prepared_tx(data, options))
     }
 
@@ -122,11 +126,17 @@ impl EthereumGateway {
     }
 
     /// Gets the Ethereum transaction receipt.
-    pub async fn tx_receipt(&self, tx_hash: H256) -> Result<Option<TransactionReceipt>, anyhow::Error> {
+    pub async fn tx_receipt(
+        &self,
+        tx_hash: H256,
+    ) -> Result<Option<TransactionReceipt>, anyhow::Error> {
         delegate_call!(self.tx_receipt(tx_hash))
     }
 
-    pub async fn failure_reason(&self, tx_hash: H256) -> Result<Option<FailureInfo>, anyhow::Error> {
+    pub async fn failure_reason(
+        &self,
+        tx_hash: H256,
+    ) -> Result<Option<FailureInfo>, anyhow::Error> {
         delegate_call!(self.failure_reason(tx_hash))
     }
 
@@ -135,7 +145,11 @@ impl EthereumGateway {
         delegate_call!(self.eth_balance(address))
     }
 
-    pub async fn allowance(&self, token_address: Address, erc20_abi: ethabi::Contract) -> Result<U256, anyhow::Error> {
+    pub async fn allowance(
+        &self,
+        token_address: Address,
+        erc20_abi: ethabi::Contract,
+    ) -> Result<U256, anyhow::Error> {
         delegate_call!(self.allowance(token_address, erc20_abi))
     }
     pub async fn get_tx_status(&self, hash: H256) -> anyhow::Result<Option<ExecutedTxStatus>> {
@@ -177,7 +191,15 @@ impl EthereumGateway {
         B: Into<Option<BlockId>> + Clone,
         P: Tokenize + Clone,
     {
-        delegate_call!(self.call_contract_function(func, params, from, options, block, token_address, erc20_abi))
+        delegate_call!(self.call_contract_function(
+            func,
+            params,
+            from,
+            options,
+            block,
+            token_address,
+            erc20_abi
+        ))
     }
 
     pub async fn logs(&self, filter: Filter) -> anyhow::Result<Vec<Log>> {
@@ -186,8 +208,8 @@ impl EthereumGateway {
 
     pub fn encode_tx_data<P: Tokenize + Clone>(&self, func: &str, params: P) -> Vec<u8> {
         match self {
-            // EthereumGateway::Multiplexed(c) => c.encode_tx_data(func, params),
-            // EthereumGateway::Direct(c) => c.encode_tx_data(func, params),
+            EthereumGateway::Multiplexed(c) => c.encode_tx_data(func, params),
+            EthereumGateway::Direct(c) => c.encode_tx_data(func, params),
             EthereumGateway::Mock(c) => c.encode_tx_data(func, params),
         }
     }
