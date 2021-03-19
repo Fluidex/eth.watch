@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use crate::types::{PriorityOp, SerialId};
 use super::received_ops::ReceivedPriorityOp;
+use crate::types::{PriorityOp, SerialId};
+use std::collections::HashMap;
 
 /// Gathered state of the Ethereum network.
 /// Contains information about the known token types and incoming

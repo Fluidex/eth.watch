@@ -8,10 +8,7 @@ use web3::{
         Contract, Options,
     },
     transports::Http,
-    types::{
-        Address, BlockId, BlockNumber, Bytes, Filter, Log, TransactionReceipt, H160, H256, U256,
-        U64,
-    },
+    types::{Address, BlockId, BlockNumber, Bytes, Filter, Log, TransactionReceipt, H160, H256, U256, U64},
     Web3,
 };
 
@@ -118,13 +115,8 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
         Ok(network_gas_price)
     }
 
-    pub async fn sign_prepared_tx(
-        &self,
-        data: Vec<u8>,
-        options: Options,
-    ) -> Result<SignedCallResult, anyhow::Error> {
-        self.sign_prepared_tx_for_addr(data, self.contract_addr, options)
-            .await
+    pub async fn sign_prepared_tx(&self, data: Vec<u8>, options: Options) -> Result<SignedCallResult, anyhow::Error> {
+        self.sign_prepared_tx_for_addr(data, self.contract_addr, options).await
     }
 
     pub async fn sign_prepared_tx_for_addr(
@@ -194,20 +186,14 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
         Ok(tx)
     }
 
-    pub async fn tx_receipt(
-        &self,
-        tx_hash: H256,
-    ) -> Result<Option<TransactionReceipt>, anyhow::Error> {
+    pub async fn tx_receipt(&self, tx_hash: H256) -> Result<Option<TransactionReceipt>, anyhow::Error> {
         let start = Instant::now();
         let receipt = self.web3.eth().transaction_receipt(tx_hash).await?;
         // metrics::histogram!("eth_client.direct.tx_receipt", start.elapsed());
         Ok(receipt)
     }
 
-    pub async fn failure_reason(
-        &self,
-        tx_hash: H256,
-    ) -> Result<Option<FailureInfo>, anyhow::Error> {
+    pub async fn failure_reason(&self, tx_hash: H256) -> Result<Option<FailureInfo>, anyhow::Error> {
         let start = Instant::now();
         let transaction = self.web3.eth().transaction(tx_hash.into()).await?.unwrap();
         let receipt = self.web3.eth().transaction_receipt(tx_hash).await?.unwrap();
@@ -224,24 +210,17 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
             data: Some(transaction.input),
         };
 
-        let encoded_revert_reason = self
-            .web3
-            .eth()
-            .call(call_request, receipt.block_number.map(Into::into))
-            .await?;
+        let encoded_revert_reason = self.web3.eth().call(call_request, receipt.block_number.map(Into::into)).await?;
         let revert_code = hex::encode(&encoded_revert_reason.0);
         let revert_reason = if encoded_revert_reason.0.len() >= 4 {
             let encoded_string_without_function_hash = &encoded_revert_reason.0[4..];
 
-            ethabi::decode(
-                &[ethabi::ParamType::String],
-                encoded_string_without_function_hash,
-            )?
-            .into_iter()
-            .next()
-            .unwrap()
-            .to_string()
-            .unwrap()
+            ethabi::decode(&[ethabi::ParamType::String], encoded_string_without_function_hash)?
+                .into_iter()
+                .next()
+                .unwrap()
+                .to_string()
+                .unwrap()
         } else {
             "unknown".to_string()
         };
@@ -266,11 +245,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
         self.eth_balance(self.sender_account).await
     }
 
-    pub async fn allowance(
-        &self,
-        token_address: Address,
-        erc20_abi: ethabi::Contract,
-    ) -> Result<U256, anyhow::Error> {
+    pub async fn allowance(&self, token_address: Address, erc20_abi: ethabi::Contract) -> Result<U256, anyhow::Error> {
         let start = Instant::now();
         let res = self
             .call_contract_function(
@@ -301,16 +276,8 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
         B: Into<Option<BlockId>>,
         P: Tokenize,
     {
-        self.call_contract_function(
-            func,
-            params,
-            from,
-            options,
-            block,
-            self.contract_addr,
-            self.contract.clone(),
-        )
-        .await
+        self.call_contract_function(func, params, from, options, block, self.contract_addr, self.contract.clone())
+            .await
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -347,19 +314,11 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
                 status: Some(status),
                 ..
             }) => {
-                let confirmations = self
-                    .block_number()
-                    .await?
-                    .saturating_sub(tx_block_number)
-                    .as_u64();
+                let confirmations = self.block_number().await?.saturating_sub(tx_block_number).as_u64();
                 let success = status.as_u64() == 1;
 
                 // Set the receipt only for failures.
-                let receipt = if success {
-                    None
-                } else {
-                    Some(receipt.unwrap())
-                };
+                let receipt = if success { None } else { Some(receipt.unwrap()) };
 
                 Ok(Some(ExecutedTxStatus {
                     confirmations,
@@ -385,12 +344,8 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
     }
 
     pub fn encode_tx_data<P: Tokenize>(&self, func: &str, params: P) -> Vec<u8> {
-        let f = self
-            .contract()
-            .function(func)
-            .expect("failed to get function parameters");
+        let f = self.contract().function(func).expect("failed to get function parameters");
 
-        f.encode_input(&params.into_tokens())
-            .expect("failed to encode parameters")
+        f.encode_input(&params.into_tokens()).expect("failed to encode parameters")
     }
 }
