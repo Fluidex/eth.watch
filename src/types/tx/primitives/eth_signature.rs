@@ -1,4 +1,4 @@
-use crate::tx::{EIP1271Signature, PackedEthSignature};
+use crate::types::tx::{EIP1271Signature, PackedEthSignature};
 use serde::{Deserialize, Serialize};
 
 /// Representation of the signature secured by L1.

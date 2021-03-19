@@ -4,8 +4,8 @@ use parity_crypto::{
     Keccak256,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use zksync_basic_types::{Address, H256};
-use zksync_utils::ZeroPrefixHexSerde;
+use crate::basic_types::{Address, H256};
+use crate::utils::ZeroPrefixHexSerde;
 
 /// Struct used for working with ethereum signatures created using eth_sign (using geth, ethers.js, etc)
 /// message is serialized as 65 bytes long `0x` prefixed string.

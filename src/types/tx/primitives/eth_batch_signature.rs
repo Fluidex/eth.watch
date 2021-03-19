@@ -1,4 +1,4 @@
-use crate::tx::TxEthSignature;
+use crate::types::tx::TxEthSignature;
 use serde::{Deserialize, Serialize};
 
 /// Representation of the signatures secured by L1 fot batch.
