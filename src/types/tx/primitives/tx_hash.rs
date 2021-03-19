@@ -40,10 +40,7 @@ impl FromStr for TxHash {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        anyhow::ensure!(
-            s.starts_with("sync-tx:"),
-            "TxHash should start with sync-tx:"
-        );
+        anyhow::ensure!(s.starts_with("sync-tx:"), "TxHash should start with sync-tx:");
         let bytes = hex::decode(&s[8..])?;
         anyhow::ensure!(bytes.len() == 32, "Size mismatch");
         Ok(TxHash {

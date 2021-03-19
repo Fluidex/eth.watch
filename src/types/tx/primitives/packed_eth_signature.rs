@@ -1,11 +1,11 @@
+use crate::basic_types::{Address, H256};
+use crate::utils::ZeroPrefixHexSerde;
 use anyhow::ensure;
 use parity_crypto::{
     publickey::{public_to_address, recover, sign, KeyPair, Signature as ETHSignature},
     Keccak256,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use crate::basic_types::{Address, H256};
-use crate::utils::ZeroPrefixHexSerde;
 
 /// Struct used for working with ethereum signatures created using eth_sign (using geth, ethers.js, etc)
 /// message is serialized as 65 bytes long `0x` prefixed string.

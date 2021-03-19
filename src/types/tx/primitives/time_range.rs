@@ -12,20 +12,14 @@ pub struct TimeRange {
 
 impl TimeRange {
     pub fn new(valid_from: u64, valid_until: u64) -> Self {
-        Self {
-            valid_from,
-            valid_until,
-        }
+        Self { valid_from, valid_until }
     }
 
     pub fn to_be_bytes(&self) -> [u8; 16] {
-        [
-            self.valid_from.to_be_bytes(),
-            self.valid_until.to_be_bytes(),
-        ]
-        .concat()
-        .try_into()
-        .expect("valid_from and valid_until should be u64")
+        [self.valid_from.to_be_bytes(), self.valid_until.to_be_bytes()]
+            .concat()
+            .try_into()
+            .expect("valid_from and valid_until should be u64")
     }
 
     pub fn check_correctness(&self) -> bool {
