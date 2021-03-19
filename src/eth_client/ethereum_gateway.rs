@@ -8,7 +8,7 @@ use crate::config;
 use crate::eth_client::clients::mock::MockEthereum;
 use crate::eth_client::clients::multiplexer::MultiplexerEthereumClient;
 use crate::eth_client::ETHDirectClient;
-
+use crate::eth_signer::PrivateKeySigner;
 use crate::types::{TransactionReceipt, H160, H256, U256};
 
 #[derive(Debug, Clone, PartialEq)]
