@@ -12,9 +12,7 @@ use web3::{
     Web3,
 };
 
-// Workspace uses
-use zksync_eth_signer::{raw_ethereum_tx::RawTransaction, EthereumSigner};
-
+use crate::eth_signer::{raw_ethereum_tx::RawTransaction, EthereumSigner};
 use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
 /// Gas limit value to be used in transaction if for some reason
 /// gas limit was not set for it.

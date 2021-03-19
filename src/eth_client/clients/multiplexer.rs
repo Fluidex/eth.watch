@@ -6,7 +6,7 @@ use web3::{
 };
 
 use crate::types::{TransactionReceipt, H160, H256, U256};
-use zksync_eth_signer::PrivateKeySigner;
+use crate::eth_signer::PrivateKeySigner;
 
 use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
 use crate::eth_client::ETHDirectClient;
