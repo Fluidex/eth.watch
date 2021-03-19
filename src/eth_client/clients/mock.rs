@@ -1,18 +1,16 @@
-use std::sync::Arc;
-
-use anyhow::Error;
-use ethabi::{Address, Contract};
-use std::collections::{HashMap, HashSet};
-use tokio::sync::RwLock;
-use web3::contract::tokens::{Detokenize, Tokenize};
-use web3::contract::Options;
-use web3::types::{BlockId, Filter, Log, U64};
-
 use crate::eth_client::{
     ethereum_gateway::{ExecutedTxStatus, FailureInfo},
     SignedCallResult,
 };
 use crate::types::{TransactionReceipt, H160, H256, U256};
+use anyhow::Error;
+use ethabi::{Address, Contract};
+use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use web3::contract::tokens::{Detokenize, Tokenize};
+use web3::contract::Options;
+use web3::types::{BlockId, Filter, Log, U64};
 
 /// Mock Ethereum client is capable of recording all the incoming requests for the further analysis.
 #[derive(Debug, Clone)]

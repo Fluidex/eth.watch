@@ -2,18 +2,13 @@ use crate::eth_signer::error::{RpcSignerError, SignerError};
 use crate::eth_signer::json_rpc_signer::messages::JsonRpcRequest;
 use crate::eth_signer::EthereumSigner;
 use crate::eth_signer::RawTransaction;
-
-use jsonrpc_core::types::response::Output;
 use crate::types::tx::{PackedEthSignature, TxEthSignature};
 use crate::types::Address;
+use jsonrpc_core::types::response::Output;
 
 use serde_json::Value;
 
-pub fn is_signature_from_address(
-    signature: &PackedEthSignature,
-    msg: &[u8],
-    address: Address,
-) -> Result<bool, SignerError> {
+pub fn is_signature_from_address(signature: &PackedEthSignature, msg: &[u8], address: Address) -> Result<bool, SignerError> {
     let signature_is_correct = signature
         .signature_recover_signer(msg)
         .map_err(|err| SignerError::RecoverAddress(err.to_string()))?
@@ -70,17 +65,14 @@ impl EthereumSigner for JsonRpcSigner {
                 .post(&message)
                 .await
                 .map_err(|err| SignerError::SigningFailed(err.to_string()))?;
-            serde_json::from_value(ret)
-                .map_err(|err| SignerError::SigningFailed(err.to_string()))?
+            serde_json::from_value(ret).map_err(|err| SignerError::SigningFailed(err.to_string()))?
         };
 
         // Checks the correctness of the message signature without a prefix
         if is_signature_from_address(&signature, msg, self.address()?)? {
             Ok(TxEthSignature::EthereumSignature(signature))
         } else {
-            Err(SignerError::SigningFailed(
-                "Invalid signature from JsonRpcSigner".to_string(),
-            ))
+            Err(SignerError::SigningFailed("Invalid signature from JsonRpcSigner".to_string()))
         }
     }
 
@@ -88,19 +80,12 @@ impl EthereumSigner for JsonRpcSigner {
     async fn sign_transaction(&self, raw_tx: RawTransaction) -> Result<Vec<u8>, SignerError> {
         let msg = JsonRpcRequest::sign_transaction(self.address()?, raw_tx);
 
-        let ret = self
-            .post(&msg)
-            .await
-            .map_err(|err| SignerError::SigningFailed(err.to_string()))?;
+        let ret = self.post(&msg).await.map_err(|err| SignerError::SigningFailed(err.to_string()))?;
 
         // get Json object and parse it to get raw Transaction
-        let json: Value = serde_json::from_value(ret)
-            .map_err(|err| SignerError::SigningFailed(err.to_string()))?;
+        let json: Value = serde_json::from_value(ret).map_err(|err| SignerError::SigningFailed(err.to_string()))?;
 
-        let raw_tx: Option<&str> = json
-            .get("raw")
-            .and_then(|value| value.as_str())
-            .map(|value| &value["0x".len()..]);
+        let raw_tx: Option<&str> = json.get("raw").and_then(|value| value.as_str()).map(|value| &value["0x".len()..]);
 
         if let Some(raw_tx) = raw_tx {
             hex::decode(raw_tx).map_err(|err| SignerError::DecodeRawTxFailed(err.to_string()))
@@ -160,10 +145,7 @@ impl JsonRpcSigner {
 
     /// Specifies the Ethreum address which sets the address for which all other requests will be processed.
     /// If the address has already been set, then it will all the same change to a new one.
-    pub async fn detect_address(
-        &mut self,
-        address_or_index: AddressOrIndex,
-    ) -> Result<Address, SignerError> {
+    pub async fn detect_address(&mut self, address_or_index: AddressOrIndex) -> Result<Address, SignerError> {
         self.address = match address_or_index {
             AddressOrIndex::Address(address) => Some(address),
             AddressOrIndex::Index(index) => {
@@ -172,8 +154,7 @@ impl JsonRpcSigner {
                     .post(&message)
                     .await
                     .map_err(|err| SignerError::SigningFailed(err.to_string()))?;
-                let accounts: Vec<Address> = serde_json::from_value(ret)
-                    .map_err(|err| SignerError::SigningFailed(err.to_string()))?;
+                let accounts: Vec<Address> = serde_json::from_value(ret).map_err(|err| SignerError::SigningFailed(err.to_string()))?;
                 accounts.get(index).copied()
             }
         };
@@ -189,7 +170,8 @@ impl JsonRpcSigner {
             return Ok(());
         }
 
-        let msg = "JsonRpcSigner type was not specified. Sign this message to detect the signer type. It only has to be done once per session";
+        let msg =
+            "JsonRpcSigner type was not specified. Sign this message to detect the signer type. It only has to be done once per session";
         let msg_with_prefix = format!("\x19Ethereum Signed Message:\n{}{}", msg.len(), msg);
 
         let signature: PackedEthSignature = {
@@ -199,8 +181,7 @@ impl JsonRpcSigner {
                 .post(&message)
                 .await
                 .map_err(|err| SignerError::SigningFailed(err.to_string()))?;
-            serde_json::from_value(ret)
-                .map_err(|err| SignerError::SigningFailed(err.to_string()))?
+            serde_json::from_value(ret).map_err(|err| SignerError::SigningFailed(err.to_string()))?
         };
 
         if is_signature_from_address(&signature, &msg.as_bytes(), self.address()?)? {
@@ -213,9 +194,7 @@ impl JsonRpcSigner {
 
         match self.signer_type.is_some() {
             true => Ok(()),
-            false => Err(SignerError::SigningFailed(
-                "Failed to get the correct signature".to_string(),
-            )),
+            false => Err(SignerError::SigningFailed("Failed to get the correct signature".to_string())),
         }
     }
 
@@ -227,15 +206,12 @@ impl JsonRpcSigner {
             .await
             .map_err(|err| SignerError::UnlockingFailed(err.to_string()))?;
 
-        let res: bool = serde_json::from_value(ret)
-            .map_err(|err| SignerError::UnlockingFailed(err.to_string()))?;
+        let res: bool = serde_json::from_value(ret).map_err(|err| SignerError::UnlockingFailed(err.to_string()))?;
 
         if res {
             Ok(())
         } else {
-            Err(SignerError::UnlockingFailed(
-                "Server response: false".to_string(),
-            ))
+            Err(SignerError::UnlockingFailed("Server response: false".to_string()))
         }
     }
 
@@ -244,10 +220,7 @@ impl JsonRpcSigner {
     /// `Ok` is returned only for successful calls, for any kind of error
     /// the `Err` variant is returned (including the failed RPC method
     /// execution response).
-    async fn post(
-        &self,
-        message: impl serde::Serialize,
-    ) -> Result<serde_json::Value, RpcSignerError> {
+    async fn post(&self, message: impl serde::Serialize) -> Result<serde_json::Value, RpcSignerError> {
         let reply: Output = self.post_raw(message).await?;
 
         let ret = match reply {
@@ -272,16 +245,10 @@ impl JsonRpcSigner {
             .await
             .map_err(|err| RpcSignerError::NetworkError(err.to_string()))?;
         if res.status() != reqwest::StatusCode::OK {
-            let error = format!(
-                "Post query responded with a non-OK response: {}",
-                res.status()
-            );
+            let error = format!("Post query responded with a non-OK response: {}", res.status());
             return Err(RpcSignerError::NetworkError(error));
         }
-        let reply: Output = res
-            .json()
-            .await
-            .map_err(|err| RpcSignerError::MalformedResponse(err.to_string()))?;
+        let reply: Output = res.json().await.map_err(|err| RpcSignerError::MalformedResponse(err.to_string()))?;
 
         Ok(reply)
     }
@@ -289,8 +256,8 @@ impl JsonRpcSigner {
 
 mod messages {
     use crate::eth_signer::RawTransaction;
-    use hex::encode;
     use crate::types::Address;
+    use hex::encode;
 
     #[derive(Debug, Serialize, Deserialize)]
     pub struct JsonRpcRequest {
@@ -330,9 +297,7 @@ mod messages {
         pub fn sign_message(address: Address, message: &[u8]) -> Self {
             let mut params = Vec::new();
             params.push(serde_json::to_value(address).expect("serialization fail"));
-            params.push(
-                serde_json::to_value(format!("0x{}", encode(message))).expect("serialization fail"),
-            );
+            params.push(serde_json::to_value(format!("0x{}", encode(message))).expect("serialization fail"));
             Self::create("eth_sign", params)
         }
 
@@ -400,8 +365,7 @@ mod tests {
                 let _address: Address = serde_json::from_value(req.params[0].clone()).unwrap();
                 let data: String = serde_json::from_value(req.params[1].clone()).unwrap();
                 let data_bytes = hex::decode(&data[2..]).unwrap();
-                let signature =
-                    PackedEthSignature::sign(state.key_pairs[0].secret(), &data_bytes).unwrap();
+                let signature = PackedEthSignature::sign(state.key_pairs[0].secret(), &data_bytes).unwrap();
                 create_success(json!(signature))
             }
             "eth_signTransaction" => {
@@ -446,10 +410,7 @@ mod tests {
             let new_url = format!("127.0.0.1:{}", i);
             // Try to bind to some port, hope that 999 variants will be enough
             let tmp_state = state.clone();
-            if let Ok(ser) =
-                HttpServer::new(move || App::new().data(tmp_state.clone()).service(index))
-                    .bind(new_url.clone())
-            {
+            if let Ok(ser) = HttpServer::new(move || App::new().data(tmp_state.clone()).service(index)).bind(new_url.clone()) {
                 server = Some(ser);
                 url = Some(new_url);
                 break;
@@ -472,9 +433,7 @@ mod tests {
         // Get address is ok,  unlock address is ok, recover address from signature is also ok
         let client = JsonRpcSigner::new(address, None, None, None).await.unwrap();
         let msg = b"some_text_message";
-        if let TxEthSignature::EthereumSignature(signature) =
-            client.sign_message(msg).await.unwrap()
-        {
+        if let TxEthSignature::EthereumSignature(signature) = client.sign_message(msg).await.unwrap() {
             assert!(is_signature_from_address(&signature, msg, client.address().unwrap()).unwrap())
         } else {
             panic!("Wrong signature type")

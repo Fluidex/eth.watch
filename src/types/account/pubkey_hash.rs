@@ -1,8 +1,7 @@
+use crate::params;
 use anyhow::ensure;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::convert::TryInto;
-
-use crate::params;
 
 /// Hash of the account's owner public key.
 ///

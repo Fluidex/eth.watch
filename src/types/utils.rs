@@ -1,14 +1,10 @@
-//! Utilities used in tx module.
-
-// External uses.
+use crate::basic_types::Address;
+use crate::utils::format_units;
 use num::{BigUint, Zero};
 use serde::{
     de::{value::SeqAccessDeserializer, Error, SeqAccess, Visitor},
     Deserialize, Deserializer,
 };
-
-use crate::basic_types::Address;
-use crate::utils::format_units;
 
 /// Deserializes either a `String` or `Vec<u8>` into `Vec<u8>`.
 /// The reason we cannot expect just a vector is backward compatibility: messages

@@ -1,11 +1,9 @@
-use std::time::Duration;
-
-use futures::{channel::mpsc, SinkExt};
-use tokio::{runtime::Runtime, time};
-
 use eth_watcher::config;
 use eth_watcher::eth_client::EthereumGateway;
 use eth_watcher::eth_watch::{EthHttpClient, EthWatch, EthWatchRequest};
+use futures::{channel::mpsc, SinkExt};
+use std::time::Duration;
+use tokio::{runtime::Runtime, time};
 
 fn main() {
     let mut main_runtime = Runtime::new().expect("main runtime start");

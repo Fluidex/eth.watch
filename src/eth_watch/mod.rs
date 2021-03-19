@@ -5,29 +5,23 @@
 //! Poll interval is configured using the `ETH_POLL_INTERVAL` constant.
 //! Number of confirmations is configured using the `CONFIRMATIONS_FOR_ETH_EVENT` environment variable.
 
-// Built-in deps
-use std::{
-    collections::HashMap,
-    time::{Duration, Instant},
-};
-
-// External uses
-use futures::{
-    channel::{mpsc, oneshot},
-    SinkExt, StreamExt,
-};
-
-use tokio::{task::JoinHandle, time};
-use web3::types::{Address, BlockNumber};
-
-use crate::params;
-use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
-
 use self::{
     client::EthClient,
     eth_state::ETHState,
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
+use crate::params;
+use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
+use futures::{
+    channel::{mpsc, oneshot},
+    SinkExt, StreamExt,
+};
+use std::{
+    collections::HashMap,
+    time::{Duration, Instant},
+};
+use tokio::{task::JoinHandle, time};
+use web3::types::{Address, BlockNumber};
 
 pub use client::EthHttpClient;
 

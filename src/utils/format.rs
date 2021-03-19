@@ -1,8 +1,5 @@
-// Built-in deps
 use std::collections::VecDeque;
 use std::string::ToString;
-// External deps
-// Workspace deps
 
 /// Formats amount in wei to tokens with precision.
 /// Behaves just like ethers.utils.formatUnits

@@ -1,15 +1,13 @@
-use std::fmt::Debug;
-
-use web3::contract::tokens::{Detokenize, Tokenize};
-use web3::contract::Options;
-use web3::types::{Address, BlockId, Filter, Log, U64};
-
 use crate::config;
 use crate::eth_client::clients::mock::MockEthereum;
 use crate::eth_client::clients::multiplexer::MultiplexerEthereumClient;
 use crate::eth_client::ETHDirectClient;
 use crate::eth_signer::PrivateKeySigner;
 use crate::types::{TransactionReceipt, H160, H256, U256};
+use std::fmt::Debug;
+use web3::contract::tokens::{Detokenize, Tokenize};
+use web3::contract::Options;
+use web3::types::{Address, BlockId, Filter, Log, U64};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SignedCallResult {

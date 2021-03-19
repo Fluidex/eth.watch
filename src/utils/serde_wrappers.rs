@@ -1,10 +1,8 @@
-use std::str::FromStr;
-
+use crate::utils::convert::*;
 use bigdecimal::BigDecimal;
 use num::{bigint::ToBigInt, rational::Ratio, BigUint};
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-
-use crate::utils::convert::*;
+use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 pub struct UnsignedRatioSerializeAsDecimal;

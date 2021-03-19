@@ -1,7 +1,7 @@
-use async_trait::async_trait;
-use error::SignerError;
 use crate::types::tx::TxEthSignature;
 use crate::types::Address;
+use async_trait::async_trait;
+use error::SignerError;
 
 pub use json_rpc_signer::JsonRpcSigner;
 pub use pk_signer::PrivateKeySigner;

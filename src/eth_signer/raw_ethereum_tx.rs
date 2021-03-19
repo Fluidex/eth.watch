@@ -1,7 +1,7 @@
+use crate::types::{H160, U256};
 use parity_crypto::{publickey::Signature, Keccak256};
 use rlp::RlpStream;
 use serde::{Deserialize, Serialize};
-use crate::types::{H160, U256};
 
 /// Description of a Transaction, pending or in the chain.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]

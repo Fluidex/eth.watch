@@ -1,7 +1,6 @@
-// Built-in deps
+use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
+use crate::eth_signer::{raw_ethereum_tx::RawTransaction, EthereumSigner};
 use std::{fmt, time::Instant};
-
-// External uses
 use web3::{
     contract::{
         tokens::{Detokenize, Tokenize},
@@ -12,8 +11,6 @@ use web3::{
     Web3,
 };
 
-use crate::eth_signer::{raw_ethereum_tx::RawTransaction, EthereumSigner};
-use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
 /// Gas limit value to be used in transaction if for some reason
 /// gas limit was not set for it.
 ///

@@ -1,15 +1,13 @@
+use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
+use crate::eth_client::ETHDirectClient;
+use crate::eth_signer::PrivateKeySigner;
+use crate::types::{TransactionReceipt, H160, H256, U256};
 use ethabi::Contract;
 use web3::{
     contract::tokens::{Detokenize, Tokenize},
     contract::Options,
     types::{Address, BlockId, Filter, Log, U64},
 };
-
-use crate::types::{TransactionReceipt, H160, H256, U256};
-use crate::eth_signer::PrivateKeySigner;
-
-use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
-use crate::eth_client::ETHDirectClient;
 
 #[derive(Debug, Clone)]
 pub struct MultiplexerEthereumClient {
