@@ -341,13 +341,13 @@ mod tests {
     use parity_crypto::publickey::{Generator, KeyPair, Random};
     use serde_json::json;
 
-    use zksync_types::{
+    use crate::types::{
         tx::{PackedEthSignature, TxEthSignature},
         Address,
     };
 
-    use super::{is_signature_from_address, messages::JsonRpcRequest};
-    use crate::{EthereumSigner, JsonRpcSigner, RawTransaction};
+    use crate::eth_signer::json_rpc_signer::{is_signature_from_address, messages::JsonRpcRequest};
+    use crate::eth_signer::{EthereumSigner, JsonRpcSigner, RawTransaction};
 
     #[post("/")]
     async fn index(req: web::Json<JsonRpcRequest>, state: web::Data<State>) -> impl Responder {

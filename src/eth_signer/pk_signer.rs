@@ -44,10 +44,10 @@ impl EthereumSigner for PrivateKeySigner {
 
 #[cfg(test)]
 mod test {
-    use super::PrivateKeySigner;
-    use super::RawTransaction;
-    use crate::EthereumSigner;
-    use zksync_types::{H160, H256, U256};
+    use crate::eth_signer::PrivateKeySigner;
+    use crate::eth_signer::RawTransaction;
+    use crate::eth_signer::EthereumSigner;
+    use crate::types::{H160, H256, U256};
 
     #[tokio::test]
     async fn test_generating_signature() {
