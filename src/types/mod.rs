@@ -1,5 +1,7 @@
 pub mod account;
 pub mod priority_ops;
+pub mod tx;
+
 mod utils;
 
 pub use self::account::PubKeyHash;
