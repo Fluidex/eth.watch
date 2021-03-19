@@ -18,7 +18,7 @@ use web3::{
 // Workspace uses
 use zksync_eth_signer::{raw_ethereum_tx::RawTransaction, EthereumSigner};
 
-use crate::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
+use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
 /// Gas limit value to be used in transaction if for some reason
 /// gas limit was not set for it.
 ///
@@ -152,7 +152,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
                 // Verbosity level is set to `error`, since we expect all the transactions to have
                 // a set limit, but don't want to crush the application if for some reason in some
                 // place limit was not set.
-                vlog::error!(
+                log::error!(
                     "No gas limit was set for transaction, using the default limit: {}",
                     FALLBACK_GAS_LIMIT
                 );

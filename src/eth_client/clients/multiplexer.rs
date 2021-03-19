@@ -6,10 +6,10 @@ use web3::{
 };
 
 use zksync_eth_signer::PrivateKeySigner;
-use zksync_types::{TransactionReceipt, H160, H256, U256};
+use crate::types::{TransactionReceipt, H160, H256, U256};
 
-use crate::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
-use crate::ETHDirectClient;
+use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
+use crate::eth_client::ETHDirectClient;
 
 #[derive(Debug, Clone)]
 pub struct MultiplexerEthereumClient {
