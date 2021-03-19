@@ -6,6 +6,9 @@ use web3::types::{Address, BlockId, Filter, Log, U64};
 
 use crate::config;
 use crate::eth_client::clients::mock::MockEthereum;
+use crate::eth_client::clients::multiplexer::MultiplexerEthereumClient;
+use crate::ETHDirectClient;
+
 use crate::types::{TransactionReceipt, H160, H256, U256};
 
 #[derive(Debug, Clone, PartialEq)]
