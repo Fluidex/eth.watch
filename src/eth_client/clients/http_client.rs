@@ -87,7 +87,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
             .eth()
             .transaction_count(self.sender_account, Some(BlockNumber::Pending))
             .await?;
-        metrics::histogram!("eth_client.direct.pending_nonce", start.elapsed());
+        // metrics::histogram!("eth_client.direct.pending_nonce", start.elapsed());
         Ok(count)
     }
 
@@ -98,14 +98,14 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
             .eth()
             .transaction_count(self.sender_account, Some(BlockNumber::Latest))
             .await?;
-        metrics::histogram!("eth_client.direct.current_nonce", start.elapsed());
+        // metrics::histogram!("eth_client.direct.current_nonce", start.elapsed());
         Ok(nonce)
     }
 
     pub async fn block_number(&self) -> Result<U64, anyhow::Error> {
         let start = Instant::now();
         let block_number = self.web3.eth().block_number().await?;
-        metrics::histogram!("eth_client.direct.current_nonce", start.elapsed());
+        // metrics::histogram!("eth_client.direct.current_nonce", start.elapsed());
         Ok(block_number)
     }
 
@@ -114,7 +114,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
         let mut network_gas_price = self.web3.eth().gas_price().await?;
         let percent_gas_price_factor = U256::from((self.gas_price_factor * 100.0).round() as u64);
         network_gas_price = (network_gas_price * percent_gas_price_factor) / U256::from(100);
-        metrics::histogram!("eth_client.direct.get_gas_price", start.elapsed());
+        // metrics::histogram!("eth_client.direct.get_gas_price", start.elapsed());
         Ok(network_gas_price)
     }
 
@@ -175,10 +175,10 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
         let signed_tx = self.eth_signer.sign_transaction(tx).await?;
         let hash = self.web3.web3().sha3(Bytes(signed_tx.clone())).await?;
 
-        metrics::histogram!(
-            "eth_client.direct.sign_prepared_tx_for_addr",
-            start.elapsed()
-        );
+        // metrics::histogram!(
+        //     "eth_client.direct.sign_prepared_tx_for_addr",
+        //     start.elapsed()
+        // );
         Ok(SignedCallResult {
             raw_tx: signed_tx,
             gas_price,
@@ -190,7 +190,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
     pub async fn send_raw_tx(&self, tx: Vec<u8>) -> Result<H256, anyhow::Error> {
         let start = Instant::now();
         let tx = self.web3.eth().send_raw_transaction(Bytes(tx)).await?;
-        metrics::histogram!("eth_client.direct.send_raw_tx", start.elapsed());
+        // metrics::histogram!("eth_client.direct.send_raw_tx", start.elapsed());
         Ok(tx)
     }
 
@@ -200,7 +200,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
     ) -> Result<Option<TransactionReceipt>, anyhow::Error> {
         let start = Instant::now();
         let receipt = self.web3.eth().transaction_receipt(tx_hash).await?;
-        metrics::histogram!("eth_client.direct.tx_receipt", start.elapsed());
+        // metrics::histogram!("eth_client.direct.tx_receipt", start.elapsed());
         Ok(receipt)
     }
 
@@ -246,7 +246,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
             "unknown".to_string()
         };
 
-        metrics::histogram!("eth_client.direct.failure_reason", start.elapsed());
+        // metrics::histogram!("eth_client.direct.failure_reason", start.elapsed());
         Ok(Some(FailureInfo {
             gas_limit,
             gas_used,
@@ -258,7 +258,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
     pub async fn eth_balance(&self, address: Address) -> Result<U256, anyhow::Error> {
         let start = Instant::now();
         let balance = self.web3.eth().balance(address, None).await?;
-        metrics::histogram!("eth_client.direct.eth_balance", start.elapsed());
+        // metrics::histogram!("eth_client.direct.eth_balance", start.elapsed());
         Ok(balance)
     }
 
@@ -283,7 +283,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
                 erc20_abi,
             )
             .await?;
-        metrics::histogram!("eth_client.direct.allowance", start.elapsed());
+        // metrics::histogram!("eth_client.direct.allowance", start.elapsed());
         Ok(res)
     }
 
@@ -333,7 +333,7 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
         let start = Instant::now();
         let contract = Contract::new(self.web3.eth(), token_address, erc20_abi);
         let res = contract.query(func, params, from, options, block).await?;
-        metrics::histogram!("eth_client.direct.call_contract_function", start.elapsed());
+        // metrics::histogram!("eth_client.direct.call_contract_function", start.elapsed());
         Ok(res)
     }
 
@@ -369,14 +369,14 @@ impl<S: EthereumSigner> ETHDirectClient<S> {
             }
             _ => Ok(None),
         };
-        metrics::histogram!("eth_client.direct.get_tx_status", start.elapsed());
+        // metrics::histogram!("eth_client.direct.get_tx_status", start.elapsed());
         Ok(res?)
     }
 
     pub async fn logs(&self, filter: Filter) -> anyhow::Result<Vec<Log>> {
         let start = Instant::now();
         let logs = self.web3.eth().logs(filter).await?;
-        metrics::histogram!("eth_client.direct.logs", start.elapsed());
+        // metrics::histogram!("eth_client.direct.logs", start.elapsed());
         Ok(logs)
     }
 
