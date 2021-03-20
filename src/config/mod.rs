@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-pub use crate::config::configs::{ContractsConfig, ETHClientConfig, ETHSenderConfig};
+pub use crate::config::configs::{ContractsConfig, ETHClientConfig, ETHSenderConfig, ETHWatchConfig};
 
 pub mod configs;
 
@@ -10,4 +10,5 @@ pub struct Settings {
     pub contracts: ContractsConfig,
     pub eth_client: ETHClientConfig,
     pub eth_sender: ETHSenderConfig,
+    pub eth_watch: ETHWatchConfig,
 }
