@@ -23,7 +23,7 @@ fn main() {
     let (eth_req_sender, eth_req_receiver) = mpsc::channel(256);
 
     let eth_client = EthHttpClient::new(client, settings.contracts.contract_addr);
-    let watcher = EthWatch::new(eth_client, 0);
+    let watcher = EthWatch::new(eth_client, settings.eth_watch.confirmations_for_eth_event);
 
     main_runtime.spawn(watcher.run(eth_req_receiver));
     main_runtime.block_on(async move {

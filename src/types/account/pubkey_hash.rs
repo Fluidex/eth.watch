@@ -34,6 +34,15 @@ impl PubKeyHash {
     /// Converts the `PubKeyHash` object into its hexadecimal representation.
     /// `PubKeyHash` hexadecimal form is prepended with the `fluidex:` prefix.
     ///
+    /// # Example
+    ///
+    /// ```
+    /// use eth_watcher::types::account::PubKeyHash;
+    ///
+    /// let pubkey_hash = PubKeyHash::zero();
+    /// assert_eq!(pubkey_hash.to_hex(), "fluidex:0000000000000000000000000000000000000000");
+    /// ```
+    ///
     pub fn to_hex(&self) -> String {
         format!("fluidex:{}", hex::encode(&self.data))
     }
@@ -41,6 +50,15 @@ impl PubKeyHash {
     /// Decodes `PubKeyHash` from its hexadecimal form.
     /// Input string must have a `fluidex:` prefix.
     ///
+    /// # Example
+    ///
+    ///
+    /// ```
+    /// use eth_watcher::types::account::PubKeyHash;
+    ///
+    /// let pubkey_hash = PubKeyHash::from_hex("fluidex:0000000000000000000000000000000000000000").unwrap();
+    /// assert_eq!(pubkey_hash, PubKeyHash::zero());
+    /// ```
     pub fn from_hex(s: &str) -> Result<Self, anyhow::Error> {
         ensure!(s.starts_with("fluidex:"), "PubKeyHash should start with fluidex:");
         let bytes = hex::decode(&s[8..])?;

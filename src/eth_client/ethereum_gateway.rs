@@ -1,4 +1,5 @@
 use crate::config;
+use crate::contracts::fluidex_contract;
 use crate::eth_client::clients::mock::MockEthereum;
 use crate::eth_client::clients::multiplexer::MultiplexerEthereumClient;
 use crate::eth_client::ETHDirectClient;
@@ -46,7 +47,39 @@ pub enum EthereumGateway {
 
 impl EthereumGateway {
     pub fn from_config(config: &config::Settings) -> Self {
-        unimplemented!();
+        if config.eth_client.web3_url.len() == 1 {
+            let transport = web3::transports::Http::new(&config.eth_client.web3_url()).unwrap();
+
+            EthereumGateway::Direct(ETHDirectClient::new(
+                transport,
+                fluidex_contract(),
+                config.eth_sender.sender.operator_commit_eth_addr,
+                PrivateKeySigner::new(config.eth_sender.sender.operator_private_key),
+                config.contracts.contract_addr,
+                config.eth_client.chain_id,
+                config.eth_client.gas_price_factor,
+            ))
+        } else {
+            let mut client = MultiplexerEthereumClient::new();
+
+            let contract = fluidex_contract();
+            for web3_url in config.eth_client.web3_url.iter() {
+                let transport = web3::transports::Http::new(web3_url).unwrap();
+                client = client.add_client(
+                    web3_url.clone(),
+                    ETHDirectClient::new(
+                        transport,
+                        contract.clone(),
+                        config.eth_sender.sender.operator_commit_eth_addr,
+                        PrivateKeySigner::new(config.eth_sender.sender.operator_private_key),
+                        config.contracts.contract_addr,
+                        config.eth_client.chain_id,
+                        config.eth_client.gas_price_factor,
+                    ),
+                );
+            }
+            EthereumGateway::Multiplexed(client)
+        }
     }
 }
 
