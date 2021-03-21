@@ -3,8 +3,7 @@ use std::fs;
 use std::io;
 use std::str::FromStr;
 
-// TODO:
-const FLUIDEX_CONTRACT_FILE: &str = "fluidex.json";
+const FLUIDEX_CONTRACT_FILE: &str = "artifacts/contracts/fluidex.sol/fluidex.json";
 
 fn read_file_to_json_value(path: &str) -> io::Result<serde_json::Value> {
     let fluidex_home = std::env::var("FLUIDEX_HOME").unwrap_or_else(|_| ".".into());
