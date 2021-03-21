@@ -19,6 +19,25 @@ async function main() {
   await fluidex.deployed();
   await fluidex.initialize();
   console.log("Fluidex deployed to:", fluidex.address);
+
+  // [sender, acc2] = await ethers.getSigners();
+  // senderAddr = sender.address;
+  [account] = await ethers.getSigners();
+  accountAddr = account.address;
+  const erc20Factory = await ethers.getContractFactory("MockERC20");
+  const decimal = 2;
+  const initialBalance = 1000;
+  erc20Mock = await erc20Factory.deploy(
+    "Test Token",
+    "TST",
+    decimal,
+    accountAddr,
+    initialBalance
+  );
+  await erc20Mock.deployed();
+  console.log("erc20Mock deployed to:", erc20Mock.address);
+
+  await fluidex.addToken(erc20Mock.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
