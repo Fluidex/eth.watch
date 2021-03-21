@@ -37,7 +37,6 @@ async function main() {
   await erc20Mock.deployed();
   console.log("erc20Mock deployed to:", erc20Mock.address);
 
-  // TODO: addToken
   await fluidex.addToken(erc20Mock.address);
 }
 
