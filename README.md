@@ -7,7 +7,5 @@ yarn install
 
 # npx hardhat test
 
-npx hardhat run scripts/deploy.js
-
-npx hardhat run scripts/add_token.js
+npx hardhat run scripts/deploy_and_add_token.js
 ```
