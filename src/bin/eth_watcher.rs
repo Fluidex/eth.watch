@@ -26,8 +26,9 @@ fn main() {
     let watcher = EthWatch::new(eth_client, settings.eth_watch.confirmations_for_eth_event);
 
     main_runtime.spawn(watcher.run(eth_req_receiver));
+    let poll_interval = settings.eth_watch.poll_interval();
     main_runtime.block_on(async move {
-        let mut timer = time::interval(Duration::from_secs(1));
+        let mut timer = time::interval(poll_interval);
 
         loop {
             timer.tick().await;
