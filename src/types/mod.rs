@@ -1,4 +1,5 @@
 pub mod account;
+pub mod operations;
 pub mod priority_ops;
 pub mod tx;
 
