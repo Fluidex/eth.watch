@@ -100,7 +100,11 @@ impl FluidexPriorityOp {
 
     /// Returns the amount of chunks required to include the priority operation into the block.
     pub fn chunks(&self) -> usize {
-        unimplemented!();
+        match self {
+            Self::Deposit(_) => DepositOp::CHUNKS,
+            // TODO: Self::FullExit(_) => FullExitOp::CHUNKS,
+            Self::FullExit(_) => 0,
+        }
     }
 }
 
