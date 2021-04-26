@@ -91,7 +91,7 @@ impl TryFrom<Log> for PriorityOp {
                 let op_type = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u8).unwrap();
                 let op_pubdata = dec_ev.remove(0).to_bytes().unwrap();
                 // TODO:
-                ZkSyncPriorityOp::parse_from_priority_queue_logs(&op_pubdata, op_type, sender)?
+                FluidexPriorityOp::parse_from_priority_queue_logs(&op_pubdata, op_type, sender)?
             },
             deadline_block: dec_ev.remove(0).to_uint().as_ref().map(U256::as_u64).unwrap(),
             eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),
