@@ -91,44 +91,7 @@ impl FluidexPriorityOp {
                     to: account,
                 }))
             }
-            FullExitOp::OP_CODE => {
-                ensure!(pub_data.len() >= TX_TYPE_BIT_WIDTH / 8, "PubData length mismatch");
-                let (_, pub_data_left) = pub_data.split_at(TX_TYPE_BIT_WIDTH / 8);
-
-                // account_id
-                let (account_id, pub_data_left) = {
-                    ensure!(pub_data_left.len() >= ACCOUNT_ID_BIT_WIDTH / 8, "PubData length mismatch");
-                    let (account_id, left) = pub_data_left.split_at(ACCOUNT_ID_BIT_WIDTH / 8);
-                    (u32::from_bytes(account_id).unwrap(), left)
-                };
-
-                // owner
-                let (eth_address, pub_data_left) = {
-                    ensure!(pub_data_left.len() >= ETH_ADDRESS_BIT_WIDTH / 8, "PubData length mismatch");
-                    let (eth_address, left) = pub_data_left.split_at(ETH_ADDRESS_BIT_WIDTH / 8);
-                    (Address::from_slice(eth_address), left)
-                };
-
-                // token
-                let (token, pub_data_left) = {
-                    ensure!(pub_data_left.len() >= TOKEN_BIT_WIDTH / 8, "PubData length mismatch");
-                    let (token, left) = pub_data_left.split_at(TOKEN_BIT_WIDTH / 8);
-                    (u16::from_be_bytes(token.try_into().unwrap()), left)
-                };
-
-                // amount
-                ensure!(
-                    pub_data_left.len() == BALANCE_BIT_WIDTH / 8,
-                    "FullExitOp parse failed: input too big: {:?}",
-                    pub_data_left
-                );
-
-                Ok(Self::FullExit(FullExit {
-                    account_id: AccountId(account_id),
-                    eth_address,
-                    token: TokenId(token),
-                }))
-            }
+            // TODO: FullExitOp
             _ => {
                 bail!("Unsupported priority op type");
             }
