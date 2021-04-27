@@ -1,6 +1,6 @@
 use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
-use crate::types::{Address, NewTokenOp, Nonce, PriorityOp, H160, U256};
+use crate::types::{Address, NewTokenOp, NewTokenOp, Nonce, PriorityOp, H160, U256};
 use anyhow::format_err;
 use ethabi::Hash;
 use std::fmt::Debug;
@@ -32,8 +32,7 @@ impl ContractTopics {
 
 #[async_trait::async_trait]
 pub trait EthClient {
-    // TODO: fix result type
-    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
+    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<NewTokenOp>>;
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
     async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>>;
@@ -87,8 +86,7 @@ impl EthHttpClient {
 
 #[async_trait::async_trait]
 impl EthClient for EthHttpClient {
-    // TODO: fix result type
-    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
+    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<NewTokenOp>> {
         let start = Instant::now();
 
         let result = self.get_events(from, to, vec![self.topics.new_token]).await;
