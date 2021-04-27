@@ -1,5 +1,5 @@
 use super::{utils::h256_as_vec, SerialId};
-use crate::basic_types::{H256, Log, U256};
+use crate::basic_types::{Log, H256, U256};
 use anyhow::{bail, ensure, format_err};
 use serde::{Deserialize, Serialize};
 use std::convert::{TryFrom, TryInto};
@@ -22,7 +22,6 @@ pub struct NewTokenOp {
     pub eth_block: u64,
 }
 
-
 impl TryFrom<Log> for NewTokenOp {
     type Error = anyhow::Error;
 
@@ -42,8 +41,8 @@ impl TryFrom<Log> for NewTokenOp {
         let sender = dec_ev.remove(0).to_address().unwrap();
         Ok(NewTokenOp {
             serial_id: dec_ev.remove(0).to_uint().as_ref().map(U256::as_u64).unwrap(),
-                // TODO:
-            data: FluidexNewTokenOp{},
+            // TODO:
+            data: FluidexNewTokenOp {},
             deadline_block: dec_ev.remove(0).to_uint().as_ref().map(U256::as_u64).unwrap(),
             eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),
             eth_block: event.block_number.expect("Event block number is missing").as_u64(),
