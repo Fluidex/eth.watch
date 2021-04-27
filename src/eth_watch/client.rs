@@ -11,12 +11,19 @@ use web3::{
 };
 
 struct ContractTopics {
+    new_token: Hash,
+    new_trading_pair: Hash,
     new_priority_request: Hash,
 }
 
 impl ContractTopics {
     fn new(fluidex_contract: &ethabi::Contract) -> Self {
         Self {
+            new_token: fluidex_contract.event("NewToken").expect("main contract abi error").signature(),
+            new_trading_pair: fluidex_contract
+                .event("NewTradingPair")
+                .expect("main contract abi error")
+                .signature(),
             new_priority_request: fluidex_contract
                 .event("NewPriorityRequest")
                 .expect("main contract abi error")
@@ -83,7 +90,17 @@ impl EthClient for EthHttpClient {
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
         let start = Instant::now();
 
-        let result = self.get_events(from, to, vec![self.topics.new_priority_request]).await;
+        let result = self
+            .get_events(
+                from,
+                to,
+                vec![
+                    self.topics.new_token,
+                    self.topics.new_trading_pair,
+                    self.topics.new_priority_request,
+                ],
+            )
+            .await;
         // metrics::histogram!("eth_watcher.get_priority_op_events", start.elapsed());
         result
     }

@@ -7,6 +7,6 @@ pub struct DepositOp {
 }
 
 impl DepositOp {
-    pub const CHUNKS: usize = 6; // TODO: ?
-    pub const OP_CODE: u8 = 0x01;
+    pub const CHUNKS: usize = 6; // TODO: need to double check
+    pub const OP_CODE: u8 = 0x01; // need to be consistent with Operations.sol
 }
