@@ -19,14 +19,14 @@ struct ContractTopics {
 impl ContractTopics {
     fn new(fluidex_contract: &ethabi::Contract) -> Self {
         Self {
-            new_token: fluidex_contract.event("NewToken").expect("main contract abi error").signature(),
+            new_token: fluidex_contract.event("NewToken").expect("main contract NewToken abi error").signature(),
             new_trading_pair: fluidex_contract
                 .event("NewTradingPair")
-                .expect("main contract abi error")
+                .expect("main contract NewTradingPair abi error")
                 .signature(),
             new_priority_request: fluidex_contract
                 .event("NewPriorityRequest")
-                .expect("main contract abi error")
+                .expect("main contract NewPriorityRequest abi error")
                 .signature(),
         }
     }
