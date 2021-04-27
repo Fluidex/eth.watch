@@ -25,6 +25,7 @@ pub struct NewTokenOp {
 impl TryFrom<Log> for NewTokenOp {
     type Error = anyhow::Error;
 
+    // TOOD: why we have OpType? how to deal with Pubdata?
     fn try_from(event: Log) -> Result<NewTokenOp, anyhow::Error> {
         let mut dec_ev = ethabi::decode(
             &[
