@@ -87,7 +87,8 @@ impl EthHttpClient {
 
 #[async_trait::async_trait]
 impl EthClient for EthHttpClient {
-    async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
+    // TODO: fix result type
+    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
         let start = Instant::now();
 
         let result = self
@@ -96,7 +97,38 @@ impl EthClient for EthHttpClient {
                 to,
                 vec![
                     self.topics.new_token,
+                ],
+            )
+            .await;
+        // metrics::histogram!("eth_watcher.get_new_token_events", start.elapsed());
+        result
+    }
+    
+    // TODO: fix result type
+    async fn get_new_trading_pair_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
+        let start = Instant::now();
+
+        let result = self
+            .get_events(
+                from,
+                to,
+                vec![
                     self.topics.new_trading_pair,
+                ],
+            )
+            .await;
+        // metrics::histogram!("eth_watcher.get_new_trading_pair_events", start.elapsed());
+        result
+    }
+    
+    async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
+        let start = Instant::now();
+
+        let result = self
+            .get_events(
+                from,
+                to,
+                vec![
                     self.topics.new_priority_request,
                 ],
             )
