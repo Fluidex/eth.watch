@@ -1,6 +1,6 @@
 use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
-use crate::types::{Address, Nonce, PriorityOp, H160, U256};
+use crate::types::{Address, NewTokenOp, Nonce, PriorityOp, H160, U256};
 use anyhow::format_err;
 use ethabi::Hash;
 use std::fmt::Debug;
