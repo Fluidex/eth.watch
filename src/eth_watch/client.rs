@@ -37,6 +37,10 @@ impl ContractTopics {
 
 #[async_trait::async_trait]
 pub trait EthClient {
+    // TODO: fix result type
+    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
+    // TODO: fix result type
+    async fn get_new_trading_pair_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
     async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>>;
