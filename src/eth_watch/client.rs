@@ -12,7 +12,7 @@ use web3::{
 
 struct ContractTopics {
     new_token: Hash,
-    new_trading_pair: Hash,
+    // new_trading_pair: Hash,
     new_priority_request: Hash,
 }
 
@@ -23,10 +23,10 @@ impl ContractTopics {
                 .event("NewToken")
                 .expect("main contract NewToken abi error")
                 .signature(),
-            new_trading_pair: fluidex_contract
-                .event("NewTradingPair")
-                .expect("main contract NewTradingPair abi error")
-                .signature(),
+            // new_trading_pair: fluidex_contract
+            //     .event("NewTradingPair")
+            //     .expect("main contract NewTradingPair abi error")
+            //     .signature(),
             new_priority_request: fluidex_contract
                 .event("NewPriorityRequest")
                 .expect("main contract NewPriorityRequest abi error")
@@ -39,8 +39,8 @@ impl ContractTopics {
 pub trait EthClient {
     // TODO: fix result type
     async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
-    // TODO: fix result type
-    async fn get_new_trading_pair_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
+    // // TODO: fix result type
+    // async fn get_new_trading_pair_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
     async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>>;
@@ -103,14 +103,14 @@ impl EthClient for EthHttpClient {
         result
     }
 
-    // TODO: fix result type
-    async fn get_new_trading_pair_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
-        let start = Instant::now();
+    // // TODO: fix result type
+    // async fn get_new_trading_pair_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
+    //     let start = Instant::now();
 
-        let result = self.get_events(from, to, vec![self.topics.new_trading_pair]).await;
-        // metrics::histogram!("eth_watcher.get_new_trading_pair_events", start.elapsed());
-        result
-    }
+    //     let result = self.get_events(from, to, vec![self.topics.new_trading_pair]).await;
+    //     // metrics::histogram!("eth_watcher.get_new_trading_pair_events", start.elapsed());
+    //     result
+    // }
 
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
         let start = Instant::now();
