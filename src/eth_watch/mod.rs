@@ -8,10 +8,10 @@
 use self::{
     client::EthClient,
     eth_state::ETHState,
-    received_ops::{sift_outdated_ops, ReceivedPriorityOp, ReceivedAddTokenOp},
+    received_ops::{sift_outdated_ops, ReceivedAddTokenOp, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, AddTokenOp, PubKeyHash};
+use crate::types::{AddTokenOp, FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
 use futures::{
     channel::{mpsc, oneshot},
     SinkExt, StreamExt,
