@@ -8,7 +8,7 @@
 use self::{
     client::EthClient,
     eth_state::ETHState,
-    received_ops::{sift_outdated_ops, ReceivedPriorityOp},
+    received_ops::{sift_outdated_ops, ReceivedPriorityOp, ReceivedAddTokenOp},
 };
 use crate::params;
 use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, AddTokenOp, PubKeyHash};
@@ -156,8 +156,8 @@ impl<W: EthClient> EthWatch<W> {
         // TODO: deal with get_new_token_events
         // TODO: get_unconfirmed_tokens
         // TODO: seems we call here twice, why?
-        // TODO: fix HashMap<u64, AddTokenOp> type
-        let token_queue: HashMap<u64, AddTokenOp> = self
+        // TODO: put these parsed op into result tuple
+        let token_queue: HashMap<u64, ReceivedAddTokenOp> = self
             .client
             .get_new_token_events(
                 BlockNumber::Number(previous_block_with_accepted_events.into()),
@@ -165,7 +165,7 @@ impl<W: EthClient> EthWatch<W> {
             )
             .await?
             .into_iter()
-            .map(|addtoken_op| (addtoken_op.serial_id, addtoken_op))
+            .map(|addtoken_op| (addtoken_op.serial_id, addtoken_op.into()))
             .collect();
 
         let unconfirmed_queue = self.get_unconfirmed_ops(current_ethereum_block).await?;
