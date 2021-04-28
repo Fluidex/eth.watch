@@ -11,7 +11,7 @@ pub struct FluidexAddTokenOp {}
 pub struct AddTokenOp {
     /// Unique ID of the priority operation.
     pub serial_id: SerialId,
-    /// new_token operation.
+    /// add_token operation.
     pub data: FluidexAddTokenOp,
     /// Ethereum deadline block until which operation must be processed.
     pub deadline_block: u64,
