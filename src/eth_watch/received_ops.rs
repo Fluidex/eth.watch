@@ -1,4 +1,4 @@
-use crate::types::PriorityOp;
+use crate::types::{PriorityOp, AddTokenOp};
 use std::{
     collections::HashMap,
     time::{Duration, Instant},
@@ -53,3 +53,40 @@ pub fn sift_outdated_ops(ops: &HashMap<u64, ReceivedPriorityOp>) -> HashMap<u64,
         .filter_map(|(id, op)| if !op.is_outdated() { Some((*id, op.clone())) } else { None })
         .collect()
 }
+
+/// Received `PriorityOp` with additional metainformation required
+/// for efficient management of the operations queue.
+#[derive(Debug, Clone)]
+pub struct ReceivedAddTokenOp {
+    op: AddTokenOp,
+    received_at: Instant,
+}
+
+impl ReceivedAddTokenOp {
+    pub fn is_outdated(&self) -> bool {
+        self.received_at.elapsed() >= PRIORITY_OP_EXPIRATION
+    }
+}
+
+impl From<AddTokenOp> for ReceivedAddTokenOp {
+    fn from(op: AddTokenOp) -> Self {
+        Self {
+            op,
+            received_at: Instant::now(),
+        }
+    }
+}
+
+impl AsRef<AddTokenOp> for ReceivedAddTokenOp {
+    fn as_ref(&self) -> &AddTokenOp {
+        &self.op
+    }
+}
+
+// /// Goes through provided operations queue, retaining only ones that are
+// /// not outdated.
+// pub fn sift_outdated_ops(ops: &HashMap<u64, ReceivedAddTokenOp>) -> HashMap<u64, ReceivedAddTokenOp> {
+//     ops.iter()
+//         .filter_map(|(id, op)| if !op.is_outdated() { Some((*id, op.clone())) } else { None })
+//         .collect()
+// }

@@ -11,7 +11,7 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, NewTokenOp, PubKeyHash};
+use crate::types::{FluidexPriorityOp, Nonce, PriorityOp, AddTokenOp, PubKeyHash};
 use futures::{
     channel::{mpsc, oneshot},
     SinkExt, StreamExt,
@@ -156,8 +156,8 @@ impl<W: EthClient> EthWatch<W> {
         // TODO: deal with get_new_token_events
         // TODO: get_unconfirmed_tokens
         // TODO: seems we call here twice, why?
-        // TODO: fix HashMap<u64, NewTokenOp> type
-        let token_queue: HashMap<u64, NewTokenOp> = self
+        // TODO: fix HashMap<u64, AddTokenOp> type
+        let token_queue: HashMap<u64, AddTokenOp> = self
             .client
             .get_new_token_events(
                 BlockNumber::Number(previous_block_with_accepted_events.into()),
