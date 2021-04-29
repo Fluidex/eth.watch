@@ -1,6 +1,6 @@
 use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
-use crate::types::{Address, Nonce, PriorityOp, H160, U256};
+use crate::types::{AddTokenOp, Address, Nonce, PriorityOp, H160, U256};
 use anyhow::format_err;
 use ethabi::Hash;
 use std::fmt::Debug;
@@ -11,15 +11,20 @@ use web3::{
 };
 
 struct ContractTopics {
+    new_token: Hash,
     new_priority_request: Hash,
 }
 
 impl ContractTopics {
     fn new(fluidex_contract: &ethabi::Contract) -> Self {
         Self {
+            new_token: fluidex_contract
+                .event("NewToken")
+                .expect("main contract NewToken abi error")
+                .signature(),
             new_priority_request: fluidex_contract
                 .event("NewPriorityRequest")
-                .expect("main contract abi error")
+                .expect("main contract NewPriorityRequest abi error")
                 .signature(),
         }
     }
@@ -27,6 +32,7 @@ impl ContractTopics {
 
 #[async_trait::async_trait]
 pub trait EthClient {
+    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<AddTokenOp>>;
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
     async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>>;
@@ -80,6 +86,14 @@ impl EthHttpClient {
 
 #[async_trait::async_trait]
 impl EthClient for EthHttpClient {
+    async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<AddTokenOp>> {
+        let start = Instant::now();
+
+        let result = self.get_events(from, to, vec![self.topics.new_token]).await;
+        // metrics::histogram!("eth_watcher.get_new_token_events", start.elapsed());
+        result
+    }
+
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>> {
         let start = Instant::now();
 
