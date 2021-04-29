@@ -157,16 +157,14 @@ impl<W: EthClient> EthWatch<W> {
         // TODO: get_unconfirmed_tokens
         // TODO: seems we call here twice, why?
         // TODO: put these parsed op into result tuple
-        let token_queue: HashMap<u64, AddTokenOp> = self
+        // TODO: map token_id to token_address? or map token_address to token_id?
+        let token_queue: Vec<AddTokenOp> = self
             .client
             .get_new_token_events(
                 BlockNumber::Number(previous_block_with_accepted_events.into()),
                 BlockNumber::Number(new_block_with_accepted_events.into()),
             )
-            .await?
-            .into_iter()
-            .map(|addtoken_op| (addtoken_op.serial_id, addtoken_op))
-            .collect();
+            .await?;
 
         let unconfirmed_queue = self.get_unconfirmed_ops(current_ethereum_block).await?;
         let priority_queue = self
