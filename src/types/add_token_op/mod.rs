@@ -1,8 +1,8 @@
 use super::{utils::h256_as_vec, TokenId};
 use crate::basic_types::{Address, Log, H256, U256};
-use anyhow::{ format_err};
+use anyhow::format_err;
 use serde::{Deserialize, Serialize};
-use std::convert::{TryFrom};
+use std::convert::TryFrom;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FluidexAddTokenOp {
