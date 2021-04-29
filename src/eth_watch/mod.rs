@@ -124,7 +124,7 @@ impl<W: EthClient> EthWatch<W> {
         // to the `number_of_confirmations_for_event` are calculated by `update_eth_state`.
         let block_difference = last_ethereum_block.saturating_sub(self.eth_state.last_ethereum_block());
 
-        let (unconfirmed_queue, received_priority_queue) = self.update_eth_state(last_ethereum_block, block_difference).await?;
+        let (unconfirmed_queue, _, received_priority_queue, _) = self.update_eth_state(last_ethereum_block, block_difference).await?;
 
         // Extend the existing priority operations with the new ones.
         let mut priority_queue = sift_outdated_ops(self.eth_state.priority_queue());
@@ -138,7 +138,7 @@ impl<W: EthClient> EthWatch<W> {
     }
 
     async fn restore_state_from_eth(&mut self, last_ethereum_block: u64) -> anyhow::Result<()> {
-        let (unconfirmed_queue, priority_queue) = self.update_eth_state(last_ethereum_block, params::PRIORITY_EXPIRATION).await?;
+        let (unconfirmed_queue, _, priority_queue, _) = self.update_eth_state(last_ethereum_block, params::PRIORITY_EXPIRATION).await?;
 
         let new_state = ETHState::new(last_ethereum_block, unconfirmed_queue, priority_queue);
 
@@ -151,15 +151,11 @@ impl<W: EthClient> EthWatch<W> {
         &mut self,
         current_ethereum_block: u64,
         unprocessed_blocks_amount: u64,
-    ) -> anyhow::Result<(Vec<PriorityOp>, HashMap<u64, ReceivedPriorityOp>)> {
+    ) -> anyhow::Result<(Vec<PriorityOp>, Vec<AddTokenOp>, HashMap<u64, ReceivedPriorityOp>, Vec<AddTokenOp>)> {
         let new_block_with_accepted_events = current_ethereum_block.saturating_sub(self.number_of_confirmations_for_event);
         let previous_block_with_accepted_events = new_block_with_accepted_events.saturating_sub(unprocessed_blocks_amount);
 
         let (unconfirmed_priority_queue, unconfirmed_addtoken_queue) = self.get_unconfirmed_ops(current_ethereum_block).await?;
-        for unconfirmed_addtoken in unconfirmed_addtoken_queue {
-            log::debug!("{:?}", unconfirmed_addtoken);
-        }
-
         let priority_queue = self
             .client
             .get_priority_op_events(
@@ -170,8 +166,20 @@ impl<W: EthClient> EthWatch<W> {
             .into_iter()
             .map(|priority_op| (priority_op.serial_id, priority_op.into()))
             .collect();
+        let addtoken_queue = self
+            .client
+            .get_new_token_events(
+                BlockNumber::Number(previous_block_with_accepted_events.into()),
+                BlockNumber::Number(new_block_with_accepted_events.into()),
+            )
+            .await?;
 
-        Ok((unconfirmed_priority_queue, priority_queue))
+        Ok((
+            unconfirmed_priority_queue,
+            unconfirmed_addtoken_queue,
+            priority_queue,
+            addtoken_queue,
+        ))
     }
 
     fn get_priority_requests(&self, first_serial_id: u64, max_chunks: usize) -> Vec<PriorityOp> {
