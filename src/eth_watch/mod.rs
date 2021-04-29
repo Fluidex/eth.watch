@@ -235,7 +235,7 @@ impl<W: EthClient> EthWatch<W> {
     }
 
     async fn poll_eth_node(&mut self) -> anyhow::Result<()> {
-        let start = Instant::now();
+        // let start = Instant::now();
         let last_block_number = self.client.block_number().await?;
 
         if last_block_number > self.eth_state.last_ethereum_block() {
