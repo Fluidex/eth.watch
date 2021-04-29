@@ -6,8 +6,8 @@ use std::convert::{TryFrom, TryInto};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FluidexAddTokenOp {
-    pub TokenAddress: Address,
-    pub TokenId: TokenId,
+    pub token_address: Address,
+    pub token_id: TokenId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,10 +34,12 @@ impl TryFrom<Log> for AddTokenOp {
         )
         .map_err(|e| format_err!("Event data decode: {:?}", e))?;
 
+        let token_address = dec_ev.remove(0).to_address().unwrap();
+        let token_id = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u16).unwrap();
         Ok(AddTokenOp {
             data: FluidexAddTokenOp {
-                TokenAddress: dec_ev.remove(0).to_address().unwrap(),
-                TokenId: dec_ev.remove(0).to_uint().as_ref().map(U256::as_16).unwrap(),
+                token_address: token_address,
+                token_id: TokenId(token_id),
             },
             eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),
             eth_block: event.block_number.expect("Event block number is missing").as_u64(),
