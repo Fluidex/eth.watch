@@ -1,4 +1,4 @@
-use crate::types::{PriorityOp};
+use crate::types::PriorityOp;
 use std::{
     collections::HashMap,
     time::{Duration, Instant},
