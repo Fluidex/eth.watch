@@ -1,5 +1,7 @@
 use eth_watcher::config;
-use eth_watcher::eth_client::EthereumGateway;
+use eth_watcher::contracts::fluidex_contract;
+use eth_watcher::eth_client::{ETHDirectClient, EthereumGateway};
+use eth_watcher::eth_signer::PrivateKeySigner;
 use eth_watcher::eth_watch::{EthHttpClient, EthWatch, EthWatchRequest};
 use futures::{channel::mpsc, SinkExt};
 use std::time::Duration;
@@ -18,9 +20,38 @@ fn main() {
     let settings: config::Settings = conf.try_into().unwrap();
     log::debug!("{:?}", settings);
 
-    let base = EthereumGateway::from_config(&settings);
-    let q = ETHDirectClient::new();
+    let transport = web3::transports::Http::new(&settings.eth_client.web3_url()).unwrap();
 
+    let min_abi = r#"[
+                      // balanceOf
+                      {
+                        "constant":true,
+                        "inputs":[{"name":"_owner","type":"address"}],
+                        "name":"balanceOf",
+                        "outputs":[{"name":"balance","type":"uint256"}],
+                        "type":"function"
+                      },
+                      // decimals
+                      {
+                        "constant":true,
+                        "inputs":[],
+                        "name":"decimals",
+                        "outputs":[{"name":"","type":"uint8"}],
+                        "type":"function"
+                      }
+                    ]"#;
+
+    let q = EthereumGateway::Direct(ETHDirectClient::new(
+        transport,
+        ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
+        settings.eth_sender.sender.operator_commit_eth_addr,
+        PrivateKeySigner::new(settings.eth_sender.sender.operator_private_key),
+        settings.contracts.contract_addr,
+        settings.eth_client.chain_id,
+        settings.eth_client.gas_price_factor,
+    ));
+
+    // let base = EthereumGateway::from_config(&settings);
 
     // main_runtime.spawn(watcher.run(eth_req_receiver));
     // let poll_interval = settings.eth_watch.poll_interval();
