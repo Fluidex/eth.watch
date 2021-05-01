@@ -1,25 +1,39 @@
-use web3::{
-    contract::{Contract, Options},
-    types::U256,
-};
+use eth_watcher::config;
+use eth_watcher::eth_client::EthereumGateway;
+use eth_watcher::eth_watch::{EthHttpClient, EthWatch, EthWatchRequest};
+use futures::{channel::mpsc, SinkExt};
+use std::time::Duration;
+use tokio::{runtime::Runtime, time};
 
-#[tokio::main]
-async fn main() -> web3::contract::Result<()> {
-    let _ = env_logger::try_init();
-    let http = web3::transports::Http::new("http://localhost:8545")?;
-    let web3 = web3::Web3::new(http);
+fn main() {
+    let mut main_runtime = Runtime::new().expect("main runtime start");
 
-    // Accessing existing contract
-    let contract_address = "0xd028d24f16a8893bd078259d413372ac01580769".parse().unwrap();
-    let contract = Contract::from_json(
-        web3.eth(),
-        contract_address,
-        include_bytes!("./abi.json"),
-    )?;
+    dotenv::dotenv().ok();
+    env_logger::init();
+    log::info!("ETH watcher started");
 
-    let result = contract.query("balanceOf", None, None, Options::default(), None);
-    let balance_of: U256 = result.await?;
-    assert_eq!(balance_of, 1_000_000.into());
+    let mut conf = config_rs::Config::new();
+    let config_file = dotenv::var("CONFIG_FILE").unwrap();
+    conf.merge(config_rs::File::with_name(&config_file)).unwrap();
+    let settings: config::Settings = conf.try_into().unwrap();
+    log::debug!("{:?}", settings);
 
-    Ok(())
+    let base = EthereumGateway::from_config(&settings);
+    let q = ETHDirectClient::new();
+
+
+    // main_runtime.spawn(watcher.run(eth_req_receiver));
+    // let poll_interval = settings.eth_watch.poll_interval();
+    // main_runtime.block_on(async move {
+    //     let mut timer = time::interval(poll_interval);
+
+    //     loop {
+    //         timer.tick().await;
+    //         eth_req_sender
+    //             .clone()
+    //             .send(EthWatchRequest::PollETHNode)
+    //             .await
+    //             .expect("ETH watch receiver dropped");
+    //     }
+    // });
 }
