@@ -39,7 +39,7 @@ fn main() {
                       }
                     ]"#;
 
-    let q = EthereumGateway::Direct(ETHDirectClient::new(
+    let q = ETHDirectClient::new(
         transport,
         ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
         settings.eth_sender.sender.operator_commit_eth_addr,
@@ -47,7 +47,18 @@ fn main() {
         settings.contracts.contract_addr,
         settings.eth_client.chain_id,
         settings.eth_client.gas_price_factor,
-    ));
+    );
+
+    // q.call_contract_function(
+    //     "allowance",
+    //     (self.sender_account, self.contract_addr),
+    //     None,
+    //     Options::default(),
+    //     None,
+    //     token_address,
+    //     erc20_abi,
+    // )
+    // .await;
 
     // let base = EthereumGateway::from_config(&settings);
 
