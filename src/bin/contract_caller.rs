@@ -23,7 +23,6 @@ fn main() {
     let transport = web3::transports::Http::new(&settings.eth_client.web3_url()).unwrap();
 
     let min_abi = r#"[
-                      // balanceOf
                       {
                         "constant":true,
                         "inputs":[{"name":"_owner","type":"address"}],
@@ -31,7 +30,6 @@ fn main() {
                         "outputs":[{"name":"balance","type":"uint256"}],
                         "type":"function"
                       },
-                      // decimals
                       {
                         "constant":true,
                         "inputs":[],
