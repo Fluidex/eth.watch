@@ -49,16 +49,16 @@ fn main() {
         settings.eth_client.gas_price_factor,
     );
 
-    // q.call_contract_function(
-    //     "allowance",
-    //     (self.sender_account, self.contract_addr),
-    //     None,
-    //     Options::default(),
-    //     None,
-    //     token_address,
-    //     erc20_abi,
-    // )
-    // .await;
+    q.call_contract_function(
+        "allowance",
+       ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
+        None,
+        web3::contract::Options::default(),
+        None,
+        contract_addr,
+        ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
+    )
+    .await;
 
     // let base = EthereumGateway::from_config(&settings);
 
