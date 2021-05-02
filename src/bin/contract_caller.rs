@@ -26,30 +26,58 @@ fn main() {
 
     let min_abi = r#"[
                       {
-                        "constant":true,
-                        "inputs":[{"name":"_owner","type":"address"}],
-                        "name":"balanceOf",
-                        "outputs":[{"name":"balance","type":"uint256"}],
-                        "type":"function"
+                        "name":"symbol",
+                        "inputs":[],
+                        "outputs":[{"name":"","type":"string"}],
+                        "type":"function",
+                        "constant":true
                       },
                       {
-                        "constant":true,
+                        "name":"name",
                         "inputs":[],
+                        "outputs":[{"name":"","type":"string"}],
+                        "type":"function",
+                        "constant":true
+                      },
+                      {
                         "name":"decimals",
+                        "inputs":[],
                         "outputs":[{"name":"","type":"uint8"}],
-                        "type":"function"
+                        "type":"function",
+                        "constant":true
+                      },
+                      {
+                        "name":"totalSupply",
+                        "inputs":[],
+                        "outputs":[{"name":"","type":"uint256"}],
+                        "type":"function",
+                        "constant":true
                       }
                     ]"#;
     let contract_addr: web3::types::Address = "9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0".parse().unwrap();
-    let my_addr: web3::types::Address = "f39fd6e51aad88f6f4ce6ab8827279cfffb92266".parse().unwrap();
     let contract = web3::contract::Contract::from_json(web3.eth(), contract_addr, min_abi.as_bytes()).unwrap();
 
     main_runtime.block_on(async move {
-        let result: U256 = contract
-            .query("balanceOf", (my_addr, ), None, web3::contract::Options::default(), None)
+        let symbol: String = contract
+            .query("symbol", (), None, web3::contract::Options::default(), None)
+            .await
+            .unwrap();
+        let name: String = contract
+            .query("name", (), None, web3::contract::Options::default(), None)
+            .await
+            .unwrap();
+        let decimals: u8 = contract
+            .query("decimals", (), None, web3::contract::Options::default(), None)
+            .await
+            .unwrap();
+        let total_supply: U256 = contract
+            .query("totalSupply", (), None, web3::contract::Options::default(), None)
             .await
             .unwrap();
 
-        log::info!("{:?}", result);
+        log::info!("{:?}", symbol);
+        log::info!("{:?}", name);
+        log::info!("{:?}", decimals);
+        log::info!("{:?}", total_supply);
     });
 }

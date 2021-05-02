@@ -26,7 +26,7 @@ async function main() {
   accountAddr = account.address;
   const erc20Factory = await ethers.getContractFactory("MockERC20");
   const decimal = 2;
-  const initialBalance = 10000;
+  const initialBalance = 1000;
   erc20Mock = await erc20Factory.deploy(
     "Test Token",
     "TST",
