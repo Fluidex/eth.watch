@@ -22,6 +22,7 @@ fn main() {
     log::debug!("{:?}", settings);
 
     let transport = web3::transports::Http::new(&settings.eth_client.web3_url()).unwrap();
+    let web3 = web3::Web3::new(transport);
 
     let min_abi = r#"[
                       {
@@ -40,42 +41,24 @@ fn main() {
                       }
                     ]"#;
     let contract_addr: web3::types::Address = "0x...".parse().unwrap();
-    let q = ETHDirectClient::new(
-        transport,
-        ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
-        settings.eth_sender.sender.operator_commit_eth_addr,
-        PrivateKeySigner::new(settings.eth_sender.sender.operator_private_key),
-        contract_addr,
-        settings.eth_client.chain_id,
-        settings.eth_client.gas_price_factor,
-    );
-
-    // let sasa: U256 = q
-    //     .call_contract_function(
-    //         "allowance",
-    //         // ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
-    //         (),
-    //         None,
-    //         web3::contract::Options::default(),
-    //         None,
-    //         contract_addr,
-    //         ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
-    //     )
-    //     .await
-    //     .unwrap();
+    let contract = web3::contract::Contract::from_json(web3.eth(), contract_addr, min_abi.as_bytes()).unwrap();
 
     main_runtime.block_on(async move {
-        let sasa: U256 = q
-            .call_contract_function(
-                "allowance",
-                // ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
-                (),
-                None,
-                web3::contract::Options::default(),
-                None,
-                contract_addr,
-                ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
-            )
+        // let sasa: U256 = q
+        //     .call_contract_function(
+        //         "allowance",
+        //         // ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
+        //         (),
+        //         None,
+        //         web3::contract::Options::default(),
+        //         None,
+        //         contract_addr,
+        //         ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
+        //     )
+        //     .await
+        //     .unwrap();
+        let result: U256 = contract
+            .query("balanceOf", (), None, web3::contract::Options::default(), None)
             .await
             .unwrap();
     });
