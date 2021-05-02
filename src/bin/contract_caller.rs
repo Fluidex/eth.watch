@@ -3,6 +3,7 @@ use eth_watcher::contracts::fluidex_contract;
 use eth_watcher::eth_client::{ETHDirectClient, EthereumGateway};
 use eth_watcher::eth_signer::PrivateKeySigner;
 use eth_watcher::eth_watch::{EthHttpClient, EthWatch, EthWatchRequest};
+use eth_watcher::types::U256;
 use futures::{channel::mpsc, SinkExt};
 use std::time::Duration;
 use tokio::{runtime::Runtime, time};
@@ -49,31 +50,33 @@ fn main() {
         settings.eth_client.gas_price_factor,
     );
 
-    q.call_contract_function(
-        "allowance",
-       ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
-        None,
-        web3::contract::Options::default(),
-        None,
-        contract_addr,
-        ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
-    )
-    .await;
+    // let sasa: U256 = q
+    //     .call_contract_function(
+    //         "allowance",
+    //         // ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
+    //         (),
+    //         None,
+    //         web3::contract::Options::default(),
+    //         None,
+    //         contract_addr,
+    //         ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
+    //     )
+    //     .await
+    //     .unwrap();
 
-    // let base = EthereumGateway::from_config(&settings);
-
-    // main_runtime.spawn(watcher.run(eth_req_receiver));
-    // let poll_interval = settings.eth_watch.poll_interval();
-    // main_runtime.block_on(async move {
-    //     let mut timer = time::interval(poll_interval);
-
-    //     loop {
-    //         timer.tick().await;
-    //         eth_req_sender
-    //             .clone()
-    //             .send(EthWatchRequest::PollETHNode)
-    //             .await
-    //             .expect("ETH watch receiver dropped");
-    //     }
-    // });
+    main_runtime.block_on(async move {
+        let sasa: U256 = q
+            .call_contract_function(
+                "allowance",
+                // ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
+                (),
+                None,
+                web3::contract::Options::default(),
+                None,
+                contract_addr,
+                ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
+            )
+            .await
+            .unwrap();
+    });
 }
