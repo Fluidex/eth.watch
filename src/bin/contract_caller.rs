@@ -40,13 +40,16 @@ fn main() {
                         "type":"function"
                       }
                     ]"#;
-    let contract_addr: web3::types::Address = "0x...".parse().unwrap();
+    let contract_addr: web3::types::Address = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0".parse().unwrap();
+    let my_addr: web3::types::Address = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266".parse().unwrap();
     let contract = web3::contract::Contract::from_json(web3.eth(), contract_addr, min_abi.as_bytes()).unwrap();
 
     main_runtime.block_on(async move {
         let result: U256 = contract
-            .query("balanceOf", (), None, web3::contract::Options::default(), None)
+            .query("balanceOf", (my_addr, ), None, web3::contract::Options::default(), None)
             .await
             .unwrap();
+
+        log::info!("{:?}", result);
     });
 }
