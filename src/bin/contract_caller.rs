@@ -44,19 +44,6 @@ fn main() {
     let contract = web3::contract::Contract::from_json(web3.eth(), contract_addr, min_abi.as_bytes()).unwrap();
 
     main_runtime.block_on(async move {
-        // let sasa: U256 = q
-        //     .call_contract_function(
-        //         "allowance",
-        //         // ("0x...".parse().unwrap(), "0x...".parse().unwrap()),
-        //         (),
-        //         None,
-        //         web3::contract::Options::default(),
-        //         None,
-        //         contract_addr,
-        //         ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
-        //     )
-        //     .await
-        //     .unwrap();
         let result: U256 = contract
             .query("balanceOf", (), None, web3::contract::Options::default(), None)
             .await
