@@ -38,13 +38,13 @@ fn main() {
                         "type":"function"
                       }
                     ]"#;
-
+    let contract_addr: web3::types::Address = "0x...".parse().unwrap();
     let q = ETHDirectClient::new(
         transport,
         ethabi::Contract::load(min_abi.as_bytes()).unwrap(),
         settings.eth_sender.sender.operator_commit_eth_addr,
         PrivateKeySigner::new(settings.eth_sender.sender.operator_private_key),
-        settings.contracts.contract_addr,
+        contract_addr,
         settings.eth_client.chain_id,
         settings.eth_client.gas_price_factor,
     );
