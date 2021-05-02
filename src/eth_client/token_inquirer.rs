@@ -56,6 +56,7 @@ impl TokenInquirer {
         let contract_addr: web3::types::Address = contract_addr_no_prefix.parse()?;
         let contract = web3::contract::Contract::from_json(self.web3.eth(), contract_addr, MIN_ABI.as_bytes())?;
 
+        // TODO: map_err to default?
         let symbol: String = contract.query("symbol", (), None, web3::contract::Options::default(), None).await?;
         let name: String = contract.query("name", (), None, web3::contract::Options::default(), None).await?;
         let decimals: u8 = contract
