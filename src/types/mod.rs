@@ -1,5 +1,6 @@
 pub mod account;
 pub mod add_token_op;
+pub mod operations;
 pub mod priority_ops;
 pub mod tx;
 
