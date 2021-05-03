@@ -67,6 +67,7 @@ impl FluidexPriorityOp {
                     ensure!(pub_data_left.len() >= BALANCE_BIT_WIDTH / 8, "PubData length mismatch");
                     let (amount, left) = pub_data_left.split_at(BALANCE_BIT_WIDTH / 8);
                     let amount = BigUint::from_bytes_be(amount.try_into().unwrap());
+                    log::info!("ammmmmmmmm {:?}", amount.to_str_radix(10));
                     (amount, left)
                 };
 

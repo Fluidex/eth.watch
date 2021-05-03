@@ -142,6 +142,9 @@ contract Fluidex is ReentrancyGuard, Storage, Config, Events, Ownable {
             expirationBlock: expirationBlock,
             opType: opType
         });
+        console.log(block.number);
+        console.log(expirationBlock);
+        console.log(nextPriorityRequestId);
         emit NewPriorityRequest(msg.sender, nextPriorityRequestId, opType, pubData, uint256(expirationBlock));
         totalOpenPriorityRequests++;
     }
