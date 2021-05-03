@@ -39,10 +39,10 @@ async function main() {
 
   await fluidex.addToken(erc20Mock.address);
 
-
+  await erc20Mock.connect(account).approve(fluidex.address, initialBalance);
   await fluidex
         .connect(account)
-        .depositERC20(erc20Mock.address, accountAddr, 500);
+        .depositERC20(erc20Mock.address, accountAddr, initialBalance/2);
 
 
 }
