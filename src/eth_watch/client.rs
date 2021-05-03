@@ -71,14 +71,12 @@ impl EthHttpClient {
             .logs(filter)
             .await?
             .into_iter()
-            .filter_map(|event| {
-                if let Ok(event) = T::try_from(event) {
-                    Some(Ok(event))
-                } else {
+            .filter_map(|event| match T::try_from(event) {
+                Ok(ev) => Some(Ok(ev)),
+                Err(e) => {
+                    log::error!("{:?}", e);
                     None
                 }
-                // TODO: remove after update
-                // .map_err(|e| format_err!("Failed to parse event log from ETH: {:?}", e))
             })
             .collect()
     }
