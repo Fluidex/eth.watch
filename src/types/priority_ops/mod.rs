@@ -1,14 +1,8 @@
-use super::{
-    // operations::{DepositOp, FullExitOp},
-    utils::h256_as_vec,
-    AccountId,
-    SerialId,
-    TokenId,
-};
+use super::{operations::DepositOp, utils::h256_as_vec, AccountId, SerialId, TokenId};
 use crate::basic_types::{Address, Log, H256, U256};
+use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, FR_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH};
 use crate::utils::BigUintSerdeAsRadix10Str;
 use anyhow::{bail, ensure, format_err};
-use ethabi::{decode, ParamType};
 use num::{BigUint, ToPrimitive};
 use serde::{Deserialize, Serialize};
 use std::convert::{TryFrom, TryInto};
@@ -47,6 +41,58 @@ pub enum FluidexPriorityOp {
 }
 
 impl FluidexPriorityOp {
+    /// Parses priority operation from the Ethereum logs.
+    pub fn parse_from_priority_queue_logs(pub_data: &[u8], op_type_id: u8, sender: Address) -> Result<Self, anyhow::Error> {
+        // see contracts/contracts/Operations.sol
+        match op_type_id {
+            DepositOp::OP_CODE => {
+                let pub_data_left = pub_data;
+
+                ensure!(pub_data_left.len() >= TX_TYPE_BIT_WIDTH / 8, "PubData length mismatch");
+                let (_, pub_data_left) = pub_data_left.split_at(TX_TYPE_BIT_WIDTH / 8);
+
+                // account_id
+                ensure!(pub_data_left.len() >= ACCOUNT_ID_BIT_WIDTH / 8, "PubData length mismatch");
+                let (_, pub_data_left) = pub_data_left.split_at(ACCOUNT_ID_BIT_WIDTH / 8);
+
+                // token
+                let (token, pub_data_left) = {
+                    ensure!(pub_data_left.len() >= TOKEN_BIT_WIDTH / 8, "PubData length mismatch");
+                    let (token, left) = pub_data_left.split_at(TOKEN_BIT_WIDTH / 8);
+                    (u16::from_be_bytes(token.try_into().unwrap()), left)
+                };
+
+                // amount
+                let (amount, pub_data_left) = {
+                    ensure!(pub_data_left.len() >= BALANCE_BIT_WIDTH / 8, "PubData length mismatch");
+                    let (amount, left) = pub_data_left.split_at(BALANCE_BIT_WIDTH / 8);
+                    // TODO: double check this logic
+                    let amount = BigUint::from_bytes_be(amount.try_into().unwrap());
+                    (amount, left)
+                };
+
+                // account
+                let (account, pub_data_left) = {
+                    ensure!(pub_data_left.len() >= FR_ADDRESS_LEN, "PubData length mismatch");
+                    let (account, left) = pub_data_left.split_at(FR_ADDRESS_LEN);
+                    (Address::from_slice(account), left)
+                };
+
+                ensure!(pub_data_left.is_empty(), "DepositOp parse failed: input too big");
+
+                Ok(Self::Deposit(Deposit {
+                    from: sender,
+                    token: TokenId(token),
+                    amount,
+                    to: account,
+                }))
+            }
+            _ => {
+                bail!("Unsupported priority op type");
+            }
+        }
+    }
+
     /// Returns the amount of chunks required to include the priority operation into the block.
     pub fn chunks(&self) -> usize {
         unimplemented!();
@@ -73,6 +119,29 @@ impl TryFrom<Log> for PriorityOp {
     type Error = anyhow::Error;
 
     fn try_from(event: Log) -> Result<PriorityOp, anyhow::Error> {
-        unimplemented!();
+        let mut dec_ev = ethabi::decode(
+            &[
+                ethabi::ParamType::Address,
+                ethabi::ParamType::Uint(64),  // Serial id
+                ethabi::ParamType::Uint(8),   // OpType
+                ethabi::ParamType::Bytes,     // Pubdata
+                ethabi::ParamType::Uint(256), // expir. block
+            ],
+            &event.data.0,
+        )
+        .map_err(|e| format_err!("Event data decode: {:?}", e))?;
+
+        let sender = dec_ev.remove(0).to_address().unwrap();
+        Ok(PriorityOp {
+            serial_id: dec_ev.remove(0).to_uint().as_ref().map(U256::as_u64).unwrap(),
+            data: {
+                let op_type = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u8).unwrap();
+                let op_pubdata = dec_ev.remove(0).to_bytes().unwrap();
+                FluidexPriorityOp::parse_from_priority_queue_logs(&op_pubdata, op_type, sender)?
+            },
+            deadline_block: dec_ev.remove(0).to_uint().as_ref().map(U256::as_u64).unwrap(),
+            eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),
+            eth_block: event.block_number.expect("Event block number is missing").as_u64(),
+        })
     }
 }
