@@ -38,6 +38,13 @@ async function main() {
   console.log("erc20Mock deployed to:", erc20Mock.address);
 
   await fluidex.addToken(erc20Mock.address);
+
+
+  await fluidex
+        .connect(account)
+        .depositERC20(erc20Mock.address, accountAddr, 500);
+
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
