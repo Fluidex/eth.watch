@@ -155,6 +155,9 @@ impl<W: EthClient> EthWatch<W> {
         let new_block_with_accepted_events = current_ethereum_block.saturating_sub(self.number_of_confirmations_for_event);
         let previous_block_with_accepted_events = new_block_with_accepted_events.saturating_sub(unprocessed_blocks_amount);
 
+        log::info!("current_ethereum_block {:?}", current_ethereum_block);
+        log::info!("unprocessed_blocks_amount {:?}", unprocessed_blocks_amount);
+
         let (unconfirmed_priority_queue, unconfirmed_addtoken_queue) = self.get_unconfirmed_ops(current_ethereum_block).await?;
         let priority_queue = self
             .client

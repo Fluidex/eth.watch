@@ -131,7 +131,7 @@ impl TryFrom<Log> for PriorityOp {
         .map_err(|e| format_err!("Event data decode: {:?}", e))?;
 
         let sender = dec_ev.remove(0).to_address().unwrap();
-        Ok(PriorityOp {
+        let op = PriorityOp {
             serial_id: dec_ev.remove(0).to_uint().as_ref().map(U256::as_u64).unwrap(),
             data: {
                 let op_type = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u8).unwrap();
@@ -141,6 +141,12 @@ impl TryFrom<Log> for PriorityOp {
             deadline_block: dec_ev.remove(0).to_uint().as_ref().map(U256::as_u64).unwrap(),
             eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),
             eth_block: event.block_number.expect("Event block number is missing").as_u64(),
-        })
+        };
+        log::info!("{}", op.serial_id);
+        log::info!("{:?}", op.data);
+        log::info!("{}", op.deadline_block);
+        log::info!("{}", op.eth_hash);
+        log::info!("{}", op.eth_block);
+        Ok(op)
     }
 }
