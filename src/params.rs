@@ -7,7 +7,7 @@ pub const PRIORITY_EXPIRATION: u64 = 35000;
 pub const ACCOUNT_ID_BIT_WIDTH: usize = 32;
 pub const TOKEN_BIT_WIDTH: usize = 16;
 pub const TX_TYPE_BIT_WIDTH: usize = 8;
-pub const BALANCE_BIT_WIDTH: usize = 256;
+pub const BALANCE_BIT_WIDTH: usize = 256; // TODO: need to be consistent with .sol. zkSync use uint128.
 
 // Fr element encoding
 pub const FR_BIT_WIDTH: usize = 254;
