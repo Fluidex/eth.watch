@@ -118,6 +118,7 @@ impl TryFrom<Log> for PriorityOp {
     type Error = anyhow::Error;
 
     fn try_from(event: Log) -> Result<PriorityOp, anyhow::Error> {
+        log::info!("try_from");
         let mut dec_ev = ethabi::decode(
             &[
                 ethabi::ParamType::Address,
