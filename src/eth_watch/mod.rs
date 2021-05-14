@@ -51,12 +51,6 @@ enum WatcherMode {
 #[derive(Debug)]
 pub enum EthWatchRequest {
     PollETHNode,
-    IsPubkeyChangeAuthorized {
-        address: Address,
-        nonce: Nonce,
-        pubkey_hash: PubKeyHash,
-        resp: oneshot::Sender<bool>,
-    },
     GetPriorityQueueOps {
         op_start_id: u64,
         max_chunks: usize,
@@ -362,18 +356,6 @@ impl<W: EthClient> EthWatch<W> {
                 EthWatchRequest::GetUnconfirmedOpByHash { eth_hash, resp } => {
                     let unconfirmed_op = self.find_ongoing_op_by_hash(&eth_hash);
                     resp.send(unconfirmed_op).unwrap_or_default();
-                }
-                EthWatchRequest::IsPubkeyChangeAuthorized {
-                    address,
-                    nonce,
-                    pubkey_hash,
-                    resp,
-                } => {
-                    let authorized = self
-                        .is_new_pubkey_hash_authorized(address, nonce, &pubkey_hash)
-                        .await
-                        .unwrap_or(false);
-                    resp.send(authorized).unwrap_or_default();
                 }
             }
         }
