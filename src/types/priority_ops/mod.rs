@@ -3,7 +3,8 @@ use crate::basic_types::{Address, Log, H256, U256};
 use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, FR_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH};
 use crate::utils::BigUintSerdeAsRadix10Str;
 use anyhow::{bail, ensure, format_err};
-use num::{BigUint, ToPrimitive};
+use num::BigUint;
+// use num::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use std::convert::{TryFrom, TryInto};
 

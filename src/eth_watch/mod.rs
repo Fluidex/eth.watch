@@ -11,16 +11,16 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{AddTokenOp, FluidexPriorityOp, Nonce, PriorityOp};
+use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp};
 use futures::{
     channel::{mpsc, oneshot},
-    SinkExt, StreamExt,
+    StreamExt,
 };
 use std::{
     collections::HashMap,
     time::{Duration, Instant},
 };
-use tokio::{task::JoinHandle, time};
+use tokio::time;
 use web3::types::{Address, BlockNumber};
 
 pub use client::EthHttpClient;
