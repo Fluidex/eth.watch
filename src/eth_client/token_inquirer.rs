@@ -67,7 +67,7 @@ impl TokenInquirer {
         let decimals: u8 = contract
             .query("decimals", (), None, web3::contract::Options::default(), None)
             .await
-            .unwrap_or_else(|_| 18);
+            .unwrap_or(18);
         let total_supply: U256 = contract
             .query("totalSupply", (), None, web3::contract::Options::default(), None)
             .await?;
