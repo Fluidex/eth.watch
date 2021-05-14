@@ -11,7 +11,7 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{AddTokenOp, FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
+use crate::types::{AddTokenOp, FluidexPriorityOp, Nonce, PriorityOp};
 use futures::{
     channel::{mpsc, oneshot},
     SinkExt, StreamExt,
@@ -193,15 +193,6 @@ impl<W: EthClient> EthWatch<W> {
         }
 
         result
-    }
-
-    async fn is_new_pubkey_hash_authorized(&self, address: Address, nonce: Nonce, pub_key_hash: &PubKeyHash) -> anyhow::Result<bool> {
-        let auth_fact_reset_time = self.client.get_auth_fact_reset_time(address, nonce).await?;
-        if auth_fact_reset_time != 0 {
-            return Ok(false);
-        }
-        let auth_fact = self.client.get_auth_fact(address, nonce).await?;
-        Ok(auth_fact.as_slice() == tiny_keccak::keccak256(&pub_key_hash.data[..]))
     }
 
     fn find_ongoing_op_by_hash(&self, eth_hash: &[u8]) -> Option<PriorityOp> {

@@ -1,5 +1,4 @@
-use serde::{Deserialize, Serialize};
-use std::str::FromStr;
+use serde::Deserialize;
 
 pub use crate::config::configs::{ContractsConfig, ETHClientConfig, ETHSenderConfig, ETHWatchConfig};
 

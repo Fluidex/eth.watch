@@ -1,6 +1,7 @@
 use crate::eth_client::ethereum_gateway::{ExecutedTxStatus, FailureInfo, SignedCallResult};
 use crate::eth_signer::{raw_ethereum_tx::RawTransaction, EthereumSigner};
-use std::{fmt, time::Instant};
+use std::fmt;
+// use std::time::Instant;
 use web3::{
     contract::{
         tokens::{Detokenize, Tokenize},
