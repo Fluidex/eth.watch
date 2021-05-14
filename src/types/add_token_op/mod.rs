@@ -38,7 +38,7 @@ impl TryFrom<Log> for AddTokenOp {
         let token_id = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u16).unwrap();
         Ok(AddTokenOp {
             data: FluidexAddTokenOp {
-                token_address: token_address,
+                token_address,
                 token_id: TokenId(token_id),
             },
             eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),

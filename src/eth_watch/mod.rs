@@ -11,16 +11,16 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{AddTokenOp, FluidexPriorityOp, Nonce, PriorityOp, PubKeyHash};
+use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp};
 use futures::{
     channel::{mpsc, oneshot},
-    SinkExt, StreamExt,
+    StreamExt,
 };
 use std::{
     collections::HashMap,
     time::{Duration, Instant},
 };
-use tokio::{task::JoinHandle, time};
+use tokio::time;
 use web3::types::{Address, BlockNumber};
 
 pub use client::EthHttpClient;
@@ -51,12 +51,6 @@ enum WatcherMode {
 #[derive(Debug)]
 pub enum EthWatchRequest {
     PollETHNode,
-    IsPubkeyChangeAuthorized {
-        address: Address,
-        nonce: Nonce,
-        pubkey_hash: PubKeyHash,
-        resp: oneshot::Sender<bool>,
-    },
     GetPriorityQueueOps {
         op_start_id: u64,
         max_chunks: usize,
@@ -199,15 +193,6 @@ impl<W: EthClient> EthWatch<W> {
         }
 
         result
-    }
-
-    async fn is_new_pubkey_hash_authorized(&self, address: Address, nonce: Nonce, pub_key_hash: &PubKeyHash) -> anyhow::Result<bool> {
-        let auth_fact_reset_time = self.client.get_auth_fact_reset_time(address, nonce).await?;
-        if auth_fact_reset_time != 0 {
-            return Ok(false);
-        }
-        let auth_fact = self.client.get_auth_fact(address, nonce).await?;
-        Ok(auth_fact.as_slice() == tiny_keccak::keccak256(&pub_key_hash.data[..]))
     }
 
     fn find_ongoing_op_by_hash(&self, eth_hash: &[u8]) -> Option<PriorityOp> {
@@ -362,18 +347,6 @@ impl<W: EthClient> EthWatch<W> {
                 EthWatchRequest::GetUnconfirmedOpByHash { eth_hash, resp } => {
                     let unconfirmed_op = self.find_ongoing_op_by_hash(&eth_hash);
                     resp.send(unconfirmed_op).unwrap_or_default();
-                }
-                EthWatchRequest::IsPubkeyChangeAuthorized {
-                    address,
-                    nonce,
-                    pubkey_hash,
-                    resp,
-                } => {
-                    let authorized = self
-                        .is_new_pubkey_hash_authorized(address, nonce, &pubkey_hash)
-                        .await
-                        .unwrap_or(false);
-                    resp.send(authorized).unwrap_or_default();
                 }
             }
         }

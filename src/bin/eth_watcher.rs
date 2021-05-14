@@ -2,7 +2,6 @@ use eth_watcher::config;
 use eth_watcher::eth_client::EthereumGateway;
 use eth_watcher::eth_watch::{EthHttpClient, EthWatch, EthWatchRequest};
 use futures::{channel::mpsc, SinkExt};
-use std::time::Duration;
 use tokio::{runtime::Runtime, time};
 
 fn main() {

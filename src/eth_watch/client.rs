@@ -3,8 +3,9 @@ use crate::eth_client::ethereum_gateway::EthereumGateway;
 use crate::types::{AddTokenOp, Address, Nonce, PriorityOp, H160, U256};
 use anyhow::format_err;
 use ethabi::Hash;
+use std::convert::TryFrom;
 use std::fmt::Debug;
-use std::{convert::TryFrom, time::Instant};
+// use std::time::Instant;
 use web3::{
     contract::Options,
     types::{BlockNumber, FilterBuilder, Log},

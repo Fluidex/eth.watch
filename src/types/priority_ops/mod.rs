@@ -3,7 +3,8 @@ use crate::basic_types::{Address, Log, H256, U256};
 use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, FR_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH};
 use crate::utils::BigUintSerdeAsRadix10Str;
 use anyhow::{bail, ensure, format_err};
-use num::{BigUint, ToPrimitive};
+use num::BigUint;
+// use num::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use std::convert::{TryFrom, TryInto};
 
@@ -67,7 +68,7 @@ impl FluidexPriorityOp {
                     ensure!(pub_data_left.len() >= BALANCE_BIT_WIDTH / 8, "PubData length mismatch");
                     let (amount, left) = pub_data_left.split_at(BALANCE_BIT_WIDTH / 8);
                     // TODO: double check this logic
-                    let amount = BigUint::from_bytes_be(amount.try_into().unwrap());
+                    let amount = BigUint::from_bytes_be(amount /*.try_into().unwrap()*/);
                     (amount, left)
                 };
 
