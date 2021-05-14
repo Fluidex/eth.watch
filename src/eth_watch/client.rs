@@ -1,15 +1,11 @@
 use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
-use crate::types::{AddTokenOp, Address, Nonce, PriorityOp, H160, U256};
-use anyhow::format_err;
+use crate::types::{AddTokenOp, PriorityOp, H160};
 use ethabi::Hash;
 use std::convert::TryFrom;
 use std::fmt::Debug;
 // use std::time::Instant;
-use web3::{
-    contract::Options,
-    types::{BlockNumber, FilterBuilder, Log},
-};
+use web3::types::{BlockNumber, FilterBuilder, Log};
 
 struct ContractTopics {
     new_token: Hash,
@@ -36,8 +32,6 @@ pub trait EthClient {
     async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<AddTokenOp>>;
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
-    async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>>;
-    async fn get_auth_fact_reset_time(&self, address: Address, nonce: Nonce) -> anyhow::Result<u64>;
 }
 
 pub struct EthHttpClient {
@@ -103,20 +97,5 @@ impl EthClient for EthHttpClient {
 
     async fn block_number(&self) -> anyhow::Result<u64> {
         Ok(self.client.block_number().await?.as_u64())
-    }
-
-    async fn get_auth_fact(&self, address: Address, nonce: Nonce) -> anyhow::Result<Vec<u8>> {
-        self.client
-            .call_main_contract_function("authFacts", (address, u64::from(*nonce)), None, Options::default(), None)
-            .await
-            .map_err(|e| format_err!("Failed to query contract authFacts: {}", e))
-    }
-
-    async fn get_auth_fact_reset_time(&self, address: Address, nonce: Nonce) -> anyhow::Result<u64> {
-        self.client
-            .call_main_contract_function("authFactsResetTimer", (address, u64::from(*nonce)), None, Options::default(), None)
-            .await
-            .map_err(|e| format_err!("Failed to query contract authFacts: {}", e))
-            .map(|res: U256| res.as_u64())
     }
 }
