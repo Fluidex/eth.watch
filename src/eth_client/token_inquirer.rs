@@ -49,7 +49,7 @@ impl TokenInquirer {
     pub fn from_config(config: &config::Settings) -> Self {
         let transport = web3::transports::Http::new(&config.eth_client.web3_url()).unwrap();
         let web3 = web3::Web3::new(transport);
-        Self { web3: web3 }
+        Self { web3 }
     }
 
     pub async fn get_token_info(&self, contract_addr_no_prefix: String) -> Result<TokenInfo, anyhow::Error> {
