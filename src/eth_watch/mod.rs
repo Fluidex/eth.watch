@@ -125,6 +125,35 @@ impl<W: EthClient> EthWatch<W> {
         })
     }
 
+    async fn get_accepted_ops(
+        &mut self,
+        previous_block_with_accepted_events: u64,
+        new_block_with_accepted_events: u64,
+    ) -> anyhow::Result<AcceptedOps> {
+        let accepted_priority_queue = self
+            .client
+            .get_priority_op_events(
+                BlockNumber::Number(previous_block_with_accepted_events.into()),
+                BlockNumber::Number(new_block_with_accepted_events.into()),
+            )
+            .await?
+            .into_iter()
+            .map(|priority_op| (priority_op.serial_id, priority_op.into()))
+            .collect();
+        let accepted_addtoken_queue = self
+            .client
+            .get_new_token_events(
+                BlockNumber::Number(previous_block_with_accepted_events.into()),
+                BlockNumber::Number(new_block_with_accepted_events.into()),
+            )
+            .await?;
+
+        Ok(AcceptedOps {
+            priority_ops: accepted_priority_queue,
+            addtoken_ops: accepted_addtoken_queue,
+        })
+    }
+
     async fn process_new_blocks(&mut self, last_ethereum_block: u64) -> anyhow::Result<()> {
         debug_assert!(self.eth_state.last_ethereum_block() < last_ethereum_block);
 
@@ -167,36 +196,9 @@ impl<W: EthClient> EthWatch<W> {
         let previous_block_with_accepted_events = new_block_with_accepted_events.saturating_sub(unprocessed_blocks_amount);
 
         let unconfirmed_ops = self.get_unconfirmed_ops(current_ethereum_block).await?;
-        let accepted_priority_queue = self
-            .client
-            .get_priority_op_events(
-                BlockNumber::Number(previous_block_with_accepted_events.into()),
-                BlockNumber::Number(new_block_with_accepted_events.into()),
-            )
-            .await?
-            .into_iter()
-            .map(|priority_op| (priority_op.serial_id, priority_op.into()))
-            .collect();
-        let accepted_addtoken_queue = self
-            .client
-            .get_new_token_events(
-                BlockNumber::Number(previous_block_with_accepted_events.into()),
-                BlockNumber::Number(new_block_with_accepted_events.into()),
-            )
+        let accepted_ops = self
+            .get_accepted_ops(previous_block_with_accepted_events, new_block_with_accepted_events)
             .await?;
-        let accepted_registeruser_queue = self
-            .client
-            .get_register_user_events(
-                BlockNumber::Number(previous_block_with_accepted_events.into()),
-                BlockNumber::Number(new_block_with_accepted_events.into()),
-            )
-            .await?;           
-
-        let accepted_ops = AcceptedOps {
-            priority_ops: accepted_priority_queue,
-            addtoken_ops: accepted_addtoken_queue,
-            registeruser_ops: accepted_registeruser_queue,
-        };
 
         Ok((unconfirmed_ops, accepted_ops))
     }
