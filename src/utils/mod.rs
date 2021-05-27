@@ -1,4 +1,4 @@
-//! Various helpers used in the zkSync stack.
+//! Various helpers used in the Fluidex stack.
 
 mod convert;
 mod format;
