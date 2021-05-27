@@ -199,7 +199,6 @@ impl<W: EthClient> EthWatch<W> {
         let accepted_ops = self
             .get_accepted_ops(previous_block_with_accepted_events, new_block_with_accepted_events)
             .await?;
-
         Ok((unconfirmed_ops, accepted_ops))
     }
 
