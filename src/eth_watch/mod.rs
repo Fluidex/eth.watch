@@ -11,7 +11,7 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp};
+use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp, RegUserOp};
 use futures::{
     channel::{mpsc, oneshot},
     StreamExt,
@@ -81,11 +81,13 @@ pub struct EthWatch<W: EthClient> {
 struct UnconfirmedOps {
     priority_ops: Vec<PriorityOp>,
     addtoken_ops: Vec<AddTokenOp>,
+    registeruser_ops: Vec<RegUserOp>,
 }
 
 struct AcceptedOps {
     priority_ops: HashMap<u64, ReceivedPriorityOp>,
     addtoken_ops: Vec<AddTokenOp>,
+    registeruser_ops: Vec<RegUserOp>,
 }
 
 impl<W: EthClient> EthWatch<W> {
@@ -115,9 +117,11 @@ impl<W: EthClient> EthWatch<W> {
 
         let unconfirmed_priority_ops = self.client.get_priority_op_events(block_from, block_to).await?;
         let unconfirmed_addtoken_ops = self.client.get_new_token_events(block_from, block_to).await?;
+        let unconfirmed_registeruser_ops = self.client.get_register_user_events(block_from, block_to).await?;
         Ok(UnconfirmedOps {
             priority_ops: unconfirmed_priority_ops,
             addtoken_ops: unconfirmed_addtoken_ops,
+            registeruser_ops: unconfirmed_registeruser_ops,
         })
     }
 
@@ -180,10 +184,18 @@ impl<W: EthClient> EthWatch<W> {
                 BlockNumber::Number(new_block_with_accepted_events.into()),
             )
             .await?;
+        let accepted_registeruser_queue = self
+            .client
+            .get_register_user_events(
+                BlockNumber::Number(previous_block_with_accepted_events.into()),
+                BlockNumber::Number(new_block_with_accepted_events.into()),
+            )
+            .await?;           
 
         let accepted_ops = AcceptedOps {
             priority_ops: accepted_priority_queue,
             addtoken_ops: accepted_addtoken_queue,
+            registeruser_ops: accepted_registeruser_queue,
         };
 
         Ok((unconfirmed_ops, accepted_ops))
@@ -208,6 +220,7 @@ impl<W: EthClient> EthWatch<W> {
         result
     }
 
+    // TODO: fix
     fn find_ongoing_op_by_hash(&self, eth_hash: &[u8]) -> Option<PriorityOp> {
         self.eth_state
             .unconfirmed_queue()
@@ -216,6 +229,7 @@ impl<W: EthClient> EthWatch<W> {
             .cloned()
     }
 
+    // TODO: fix
     fn get_ongoing_deposits_for(&self, address: Address) -> Vec<PriorityOp> {
         self.eth_state
             .unconfirmed_queue()
@@ -231,6 +245,7 @@ impl<W: EthClient> EthWatch<W> {
             .collect()
     }
 
+    // TODO: fix
     fn get_ongoing_ops_for(&self, address: Address) -> Vec<PriorityOp> {
         self.eth_state
             .unconfirmed_queue()
