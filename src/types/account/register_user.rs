@@ -28,9 +28,9 @@ impl TryFrom<Log> for RegUserOp {
     fn try_from(event: Log) -> Result<RegUserOp, anyhow::Error> {
         let mut dec_ev = ethabi::decode(
             &[
-                ethabi::ParamType::Address,  // l1_address
-                ethabi::ParamType::Uint(16), // user_id
-                ethabi::ParamType::FixedBytes(32),    // l2_pubkey
+                ethabi::ParamType::Address,        // l1_address
+                ethabi::ParamType::Uint(16),       // user_id. TODO: need to be consistent with .sol.
+                ethabi::ParamType::FixedBytes(32), // l2_pubkey
             ],
             &event.data.0,
         )
