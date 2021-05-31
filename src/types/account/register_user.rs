@@ -7,7 +7,7 @@ use std::convert::TryFrom;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FluidexRegUserOp {
     pub l1_address: Address,
-    pub user_id: AccountId,
+    pub user_id: u16,
     pub l2_pubkey: Vec<u8>,
 }
 
@@ -26,6 +26,8 @@ impl TryFrom<Log> for RegUserOp {
     type Error = anyhow::Error;
 
     fn try_from(event: Log) -> Result<RegUserOp, anyhow::Error> {
+        unimplemented!();
+
         let mut dec_ev = ethabi::decode(
             &[
                 ethabi::ParamType::Address,  // l1_address
@@ -38,11 +40,17 @@ impl TryFrom<Log> for RegUserOp {
 
         let l1_address = dec_ev.remove(0).to_address().unwrap();
         let user_id = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u16).unwrap();
+        let l2_pubkey = dec_ev.remove(0).to_bytes().unwrap();
+
+        log::info!("{}", l1_address);
+        log::info!("{}", user_id);
+        log::info!("{:?}", l2_pubkey);
+
         Ok(RegUserOp {
             data: FluidexRegUserOp {
                 l1_address,
-                user_id: AccountId(user_id),
-                l2_pubkey: dec_ev.remove(0).to_bytes().unwrap(),
+                user_id: user_id,
+                l2_pubkey: l2_pubkey,
             },
             eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),
             eth_block: event.block_number.expect("Event block number is missing").as_u64(),

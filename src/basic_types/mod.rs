@@ -21,7 +21,7 @@ basic_type!(
 basic_type!(
     /// Unique identifier of the account in the Fluidex network.
     AccountId,
-    u16 // TODO: u32?
+    u32 // TODO: u16?
 );
 
 basic_type!(
