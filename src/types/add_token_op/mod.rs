@@ -32,7 +32,7 @@ impl TryFrom<Log> for AddTokenOp {
             ],
             &event.data.0,
         )
-        .map_err(|e| format_err!("Event data decode: {:?}", e))?;
+        .map_err(|e| format_err!("AddTokenOp Event data decode: {:?}", e))?;
 
         let token_address = dec_ev.remove(0).to_address().unwrap();
         let token_id = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u16).unwrap();

@@ -30,15 +30,15 @@ impl TryFrom<Log> for RegUserOp {
             &[
                 ethabi::ParamType::Address,  // l1_address
                 ethabi::ParamType::Uint(16), // user_id
-                ethabi::ParamType::Bytes,    // l2_pubkey. TODO: FixedBytes?
+                ethabi::ParamType::FixedBytes(32),    // l2_pubkey. TODO: FixedBytes?
             ],
             &event.data.0,
         )
-        .map_err(|e| format_err!("Event data decode: {:?}", e))?;
+        .map_err(|e| format_err!("RegUserOp Event data decode: {:?}", e))?;
 
         let l1_address = dec_ev.remove(0).to_address().unwrap();
         let user_id = dec_ev.remove(0).to_uint().as_ref().map(|ui| U256::as_u32(ui) as u16).unwrap();
-        let l2_pubkey = dec_ev.remove(0).to_bytes().unwrap();
+        let l2_pubkey = dec_ev.remove(0).to_fixed_bytes().unwrap();
 
         log::info!("{}", l1_address);
         log::info!("{}", user_id);

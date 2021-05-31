@@ -130,7 +130,7 @@ impl TryFrom<Log> for PriorityOp {
             ],
             &event.data.0,
         )
-        .map_err(|e| format_err!("Event data decode: {:?}", e))?;
+        .map_err(|e| format_err!("PriorityOp Event data decode: {:?}", e))?;
 
         let sender = dec_ev.remove(0).to_address().unwrap();
         Ok(PriorityOp {
