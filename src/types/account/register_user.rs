@@ -7,7 +7,7 @@ use std::convert::TryFrom;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FluidexRegUserOp {
     pub l1_address: Address,
-    pub user_id: u16,
+    pub user_id: u16, // TODO: change to AccountId (u32)
     pub l2_pubkey: Vec<u8>,
 }
 
