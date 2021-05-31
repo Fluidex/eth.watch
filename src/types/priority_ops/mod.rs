@@ -21,7 +21,7 @@ pub struct Deposit {
     #[serde(with = "BigUintSerdeAsRadix10Str")]
     pub amount: BigUint,
     /// Address of L2 account to deposit funds to.
-    pub to: Vec<u8>,
+    pub to: web3::types::H256,
 }
 
 /// Performs a withdrawal of funds without direct interaction with the L2 network.
@@ -76,8 +76,7 @@ impl FluidexPriorityOp {
                 let (account, pub_data_left) = {
                     ensure!(pub_data_left.len() >= BJJ_ADDRESS_LEN, "PubData length mismatch");
                     let (account, left) = pub_data_left.split_at(BJJ_ADDRESS_LEN);
-                    // (Address::from_slice(account), left)
-                    (account, left)
+                    (web3::types::H256::from_slice(account), left)
                 };
 
                 ensure!(pub_data_left.is_empty(), "DepositOp parse failed: input too big");
@@ -86,9 +85,7 @@ impl FluidexPriorityOp {
                     from: sender,
                     token: TokenId(token),
                     amount,
-                    // to_string? to_hex?
-                    // TODO:
-                    to: account.to_vec(),
+                    to: account,
                 }))
             }
             _ => {
