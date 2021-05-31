@@ -147,10 +147,18 @@ impl<W: EthClient> EthWatch<W> {
                 BlockNumber::Number(new_block_with_accepted_events.into()),
             )
             .await?;
+        let accepted_registeruser_queue = self
+            .client
+            .get_register_user_events(
+                BlockNumber::Number(previous_block_with_accepted_events.into()),
+                BlockNumber::Number(new_block_with_accepted_events.into()),
+            )
+            .await?;
 
         Ok(AcceptedOps {
             priority_ops: accepted_priority_queue,
             addtoken_ops: accepted_addtoken_queue,
+            registeruser_ops: accepted_registeruser_queue,
         })
     }
 
