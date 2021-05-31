@@ -373,7 +373,7 @@ impl<W: EthClient> EthWatch<W> {
                 } => {
                     resp.send(self.get_priority_requests(op_start_id, max_chunks)).unwrap_or_default();
                 }
-                EthWatchRequest::GetUnconfirmedDeposits { address, resp } => {
+                EthWatchRequest::GetUnconfirmedDeposits { address: _, resp: _ } => {
                     unimplemented!();
                     // let deposits_for_address = self.get_ongoing_deposits_for(address);
                     // resp.send(deposits_for_address).ok();

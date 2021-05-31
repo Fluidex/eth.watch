@@ -1,6 +1,6 @@
 use super::{operations::DepositOp, utils::h256_as_vec, AccountId, SerialId, TokenId};
 use crate::basic_types::{Address, L2Pubkey, Log, H256, U256};
-use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, BJJ_ADDRESS_LEN, FR_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH};
+use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, BJJ_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH};
 use crate::utils::BigUintSerdeAsRadix10Str;
 use anyhow::{bail, ensure, format_err};
 use num::BigUint;
