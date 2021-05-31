@@ -30,7 +30,7 @@ impl TryFrom<Log> for RegUserOp {
             &[
                 ethabi::ParamType::Address,  // l1_address
                 ethabi::ParamType::Uint(16), // user_id
-                ethabi::ParamType::Bytes,  // l2_pubkey. TODO: FixedBytes?
+                ethabi::ParamType::Bytes,    // l2_pubkey. TODO: FixedBytes?
             ],
             &event.data.0,
         )
