@@ -13,3 +13,4 @@ pub const BALANCE_BIT_WIDTH: usize = 256; // TODO: need to be consistent with .s
 pub const FR_BIT_WIDTH: usize = 254;
 
 pub const FR_ADDRESS_LEN: usize = 20;
+pub const BJJ_ADDRESS_LEN: usize = 32;

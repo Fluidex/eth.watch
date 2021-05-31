@@ -26,8 +26,6 @@ impl TryFrom<Log> for RegUserOp {
     type Error = anyhow::Error;
 
     fn try_from(event: Log) -> Result<RegUserOp, anyhow::Error> {
-        unimplemented!();
-
         let mut dec_ev = ethabi::decode(
             &[
                 ethabi::ParamType::Address,  // l1_address
