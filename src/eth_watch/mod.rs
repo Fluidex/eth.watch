@@ -239,20 +239,20 @@ impl<W: EthClient> EthWatch<W> {
     }
 
     // TODO: fix
-    fn get_ongoing_deposits_for(&self, address: Address) -> Vec<PriorityOp> {
-        self.eth_state
-            .unconfirmed_queue()
-            .iter()
-            .filter(|op| match &op.data {
-                FluidexPriorityOp::Deposit(deposit) => {
-                    // Address may be set to either sender or recipient.
-                    deposit.from == address || deposit.to == address
-                }
-                _ => false,
-            })
-            .cloned()
-            .collect()
-    }
+    // fn get_ongoing_deposits_for(&self, address: Address) -> Vec<PriorityOp> {
+    //     self.eth_state
+    //         .unconfirmed_queue()
+    //         .iter()
+    //         .filter(|op| match &op.data {
+    //             FluidexPriorityOp::Deposit(deposit) => {
+    //                 // Address may be set to either sender or recipient.
+    //                 deposit.from == address || deposit.to == address
+    //             }
+    //             _ => false,
+    //         })
+    //         .cloned()
+    //         .collect()
+    // }
 
     // TODO: fix
     fn get_ongoing_ops_for(&self, address: Address) -> Vec<PriorityOp> {
@@ -374,8 +374,9 @@ impl<W: EthClient> EthWatch<W> {
                     resp.send(self.get_priority_requests(op_start_id, max_chunks)).unwrap_or_default();
                 }
                 EthWatchRequest::GetUnconfirmedDeposits { address, resp } => {
-                    let deposits_for_address = self.get_ongoing_deposits_for(address);
-                    resp.send(deposits_for_address).ok();
+                    unimplemented!();
+                    // let deposits_for_address = self.get_ongoing_deposits_for(address);
+                    // resp.send(deposits_for_address).ok();
                 }
                 EthWatchRequest::GetUnconfirmedOps { address, resp } => {
                     let deposits_for_address = self.get_ongoing_ops_for(address);

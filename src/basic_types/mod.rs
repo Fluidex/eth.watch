@@ -12,6 +12,8 @@ use std::str::FromStr;
 
 pub use web3::types::{Address, Log, TransactionReceipt, H160, H256, U128, U256};
 
+pub type L2Pubkey = web3::types::H256;
+
 basic_type!(
     /// Unique identifier of the token in the Fluidex network.
     TokenId,

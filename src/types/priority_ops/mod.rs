@@ -1,5 +1,5 @@
 use super::{operations::DepositOp, utils::h256_as_vec, AccountId, SerialId, TokenId};
-use crate::basic_types::{Address, Log, H256, U256};
+use crate::basic_types::{Address, L2Pubkey,Log, H256, U256};
 use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, FR_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH, BJJ_ADDRESS_LEN};
 use crate::utils::BigUintSerdeAsRadix10Str;
 use anyhow::{bail, ensure, format_err};
@@ -21,7 +21,7 @@ pub struct Deposit {
     #[serde(with = "BigUintSerdeAsRadix10Str")]
     pub amount: BigUint,
     /// Address of L2 account to deposit funds to.
-    pub to: web3::types::H256,
+    pub to: L2Pubkey,
 }
 
 /// Performs a withdrawal of funds without direct interaction with the L2 network.
@@ -76,7 +76,7 @@ impl FluidexPriorityOp {
                 let (account, pub_data_left) = {
                     ensure!(pub_data_left.len() >= BJJ_ADDRESS_LEN, "PubData length mismatch");
                     let (account, left) = pub_data_left.split_at(BJJ_ADDRESS_LEN);
-                    (web3::types::H256::from_slice(account), left)
+                    (L2Pubkey::from_slice(account), left)
                 };
 
                 ensure!(pub_data_left.is_empty(), "DepositOp parse failed: input too big");

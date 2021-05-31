@@ -1,5 +1,5 @@
 use crate::basic_types::{Address, Log, H256, U256};
-use crate::types::{utils::h256_as_vec, AccountId};
+use crate::types::{utils::h256_as_vec, AccountId, L2Pubkey};
 use anyhow::format_err;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -8,7 +8,7 @@ use std::convert::TryFrom;
 pub struct FluidexRegUserOp {
     pub l1_address: Address,
     pub user_id: u16, // TODO: change to AccountId (u32)
-    pub l2_pubkey: Vec<u8>,
+    pub l2_pubkey: L2Pubkey,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,7 +48,7 @@ impl TryFrom<Log> for RegUserOp {
             data: FluidexRegUserOp {
                 l1_address,
                 user_id: user_id,
-                l2_pubkey: l2_pubkey,
+                l2_pubkey: L2Pubkey::from_slice(&l2_pubkey),
             },
             eth_hash: event.transaction_hash.expect("Event transaction hash is missing"),
             eth_block: event.block_number.expect("Event block number is missing").as_u64(),
