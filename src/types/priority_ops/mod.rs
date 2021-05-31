@@ -1,6 +1,6 @@
 use super::{operations::DepositOp, utils::h256_as_vec, AccountId, SerialId, TokenId};
-use crate::basic_types::{Address, Log, H256, U256};
-use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, FR_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH};
+use crate::basic_types::{Address, L2Pubkey, Log, H256, U256};
+use crate::params::{ACCOUNT_ID_BIT_WIDTH, BALANCE_BIT_WIDTH, BJJ_ADDRESS_LEN, TOKEN_BIT_WIDTH, TX_TYPE_BIT_WIDTH};
 use crate::utils::BigUintSerdeAsRadix10Str;
 use anyhow::{bail, ensure, format_err};
 use num::BigUint;
@@ -21,7 +21,7 @@ pub struct Deposit {
     #[serde(with = "BigUintSerdeAsRadix10Str")]
     pub amount: BigUint,
     /// Address of L2 account to deposit funds to.
-    pub to: Address,
+    pub to: L2Pubkey,
 }
 
 /// Performs a withdrawal of funds without direct interaction with the L2 network.
@@ -74,9 +74,9 @@ impl FluidexPriorityOp {
 
                 // account
                 let (account, pub_data_left) = {
-                    ensure!(pub_data_left.len() >= FR_ADDRESS_LEN, "PubData length mismatch");
-                    let (account, left) = pub_data_left.split_at(FR_ADDRESS_LEN);
-                    (Address::from_slice(account), left)
+                    ensure!(pub_data_left.len() >= BJJ_ADDRESS_LEN, "PubData length mismatch");
+                    let (account, left) = pub_data_left.split_at(BJJ_ADDRESS_LEN);
+                    (L2Pubkey::from_slice(account), left)
                 };
 
                 ensure!(pub_data_left.is_empty(), "DepositOp parse failed: input too big");
@@ -130,7 +130,7 @@ impl TryFrom<Log> for PriorityOp {
             ],
             &event.data.0,
         )
-        .map_err(|e| format_err!("Event data decode: {:?}", e))?;
+        .map_err(|e| format_err!("PriorityOp Event data decode: {:?}", e))?;
 
         let sender = dec_ev.remove(0).to_address().unwrap();
         Ok(PriorityOp {

@@ -11,7 +11,7 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp};
+use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp, RegUserOp};
 use futures::{
     channel::{mpsc, oneshot},
     StreamExt,
@@ -81,11 +81,13 @@ pub struct EthWatch<W: EthClient> {
 struct UnconfirmedOps {
     priority_ops: Vec<PriorityOp>,
     addtoken_ops: Vec<AddTokenOp>,
+    registeruser_ops: Vec<RegUserOp>,
 }
 
 struct AcceptedOps {
     priority_ops: HashMap<u64, ReceivedPriorityOp>,
     addtoken_ops: Vec<AddTokenOp>,
+    registeruser_ops: Vec<RegUserOp>,
 }
 
 impl<W: EthClient> EthWatch<W> {
@@ -115,9 +117,11 @@ impl<W: EthClient> EthWatch<W> {
 
         let unconfirmed_priority_ops = self.client.get_priority_op_events(block_from, block_to).await?;
         let unconfirmed_addtoken_ops = self.client.get_new_token_events(block_from, block_to).await?;
+        let unconfirmed_registeruser_ops = self.client.get_register_user_events(block_from, block_to).await?;
         Ok(UnconfirmedOps {
             priority_ops: unconfirmed_priority_ops,
             addtoken_ops: unconfirmed_addtoken_ops,
+            registeruser_ops: unconfirmed_registeruser_ops,
         })
     }
 
@@ -143,10 +147,18 @@ impl<W: EthClient> EthWatch<W> {
                 BlockNumber::Number(new_block_with_accepted_events.into()),
             )
             .await?;
+        let accepted_registeruser_queue = self
+            .client
+            .get_register_user_events(
+                BlockNumber::Number(previous_block_with_accepted_events.into()),
+                BlockNumber::Number(new_block_with_accepted_events.into()),
+            )
+            .await?;
 
         Ok(AcceptedOps {
             priority_ops: accepted_priority_queue,
             addtoken_ops: accepted_addtoken_queue,
+            registeruser_ops: accepted_registeruser_queue,
         })
     }
 
@@ -217,6 +229,7 @@ impl<W: EthClient> EthWatch<W> {
         result
     }
 
+    // TODO: fix
     fn find_ongoing_op_by_hash(&self, eth_hash: &[u8]) -> Option<PriorityOp> {
         self.eth_state
             .unconfirmed_queue()
@@ -225,21 +238,23 @@ impl<W: EthClient> EthWatch<W> {
             .cloned()
     }
 
-    fn get_ongoing_deposits_for(&self, address: Address) -> Vec<PriorityOp> {
-        self.eth_state
-            .unconfirmed_queue()
-            .iter()
-            .filter(|op| match &op.data {
-                FluidexPriorityOp::Deposit(deposit) => {
-                    // Address may be set to either sender or recipient.
-                    deposit.from == address || deposit.to == address
-                }
-                _ => false,
-            })
-            .cloned()
-            .collect()
-    }
+    // TODO: fix
+    // fn get_ongoing_deposits_for(&self, address: Address) -> Vec<PriorityOp> {
+    //     self.eth_state
+    //         .unconfirmed_queue()
+    //         .iter()
+    //         .filter(|op| match &op.data {
+    //             FluidexPriorityOp::Deposit(deposit) => {
+    //                 // Address may be set to either sender or recipient.
+    //                 deposit.from == address || deposit.to == address
+    //             }
+    //             _ => false,
+    //         })
+    //         .cloned()
+    //         .collect()
+    // }
 
+    // TODO: fix
     fn get_ongoing_ops_for(&self, address: Address) -> Vec<PriorityOp> {
         self.eth_state
             .unconfirmed_queue()
@@ -358,9 +373,10 @@ impl<W: EthClient> EthWatch<W> {
                 } => {
                     resp.send(self.get_priority_requests(op_start_id, max_chunks)).unwrap_or_default();
                 }
-                EthWatchRequest::GetUnconfirmedDeposits { address, resp } => {
-                    let deposits_for_address = self.get_ongoing_deposits_for(address);
-                    resp.send(deposits_for_address).ok();
+                EthWatchRequest::GetUnconfirmedDeposits { address: _, resp: _ } => {
+                    unimplemented!();
+                    // let deposits_for_address = self.get_ongoing_deposits_for(address);
+                    // resp.send(deposits_for_address).ok();
                 }
                 EthWatchRequest::GetUnconfirmedOps { address, resp } => {
                     let deposits_for_address = self.get_ongoing_ops_for(address);

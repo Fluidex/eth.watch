@@ -6,7 +6,7 @@ pub mod tx;
 
 mod utils;
 
-pub use self::account::PubKeyHash;
+pub use self::account::{PubKeyHash, RegUserOp};
 pub use self::add_token_op::AddTokenOp;
 pub use self::priority_ops::{Deposit, FluidexPriorityOp, FullExit, PriorityOp};
 pub use crate::basic_types::*;

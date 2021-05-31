@@ -1,6 +1,6 @@
 use crate::contracts::fluidex_contract;
 use crate::eth_client::ethereum_gateway::EthereumGateway;
-use crate::types::{AddTokenOp, PriorityOp, H160};
+use crate::types::{AddTokenOp, PriorityOp, RegUserOp, H160};
 use ethabi::Hash;
 use std::convert::TryFrom;
 use std::fmt::Debug;
@@ -9,6 +9,7 @@ use web3::types::{BlockNumber, FilterBuilder, Log};
 
 struct ContractTopics {
     new_token: Hash,
+    new_user: Hash,
     new_priority_request: Hash,
 }
 
@@ -18,6 +19,10 @@ impl ContractTopics {
             new_token: fluidex_contract
                 .event("NewToken")
                 .expect("main contract NewToken abi error")
+                .signature(),
+            new_user: fluidex_contract
+                .event("RegisterUser")
+                .expect("main contract RegisterUser abi error")
                 .signature(),
             new_priority_request: fluidex_contract
                 .event("NewPriorityRequest")
@@ -30,6 +35,7 @@ impl ContractTopics {
 #[async_trait::async_trait]
 pub trait EthClient {
     async fn get_new_token_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<AddTokenOp>>;
+    async fn get_register_user_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<RegUserOp>>;
     async fn get_priority_op_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<PriorityOp>>;
     async fn block_number(&self) -> anyhow::Result<u64>;
 }
@@ -84,6 +90,14 @@ impl EthClient for EthHttpClient {
 
         let result = self.get_events(from, to, vec![self.topics.new_token]).await;
         // metrics::histogram!("eth_watcher.get_new_token_events", start.elapsed());
+        result
+    }
+
+    async fn get_register_user_events(&self, from: BlockNumber, to: BlockNumber) -> anyhow::Result<Vec<RegUserOp>> {
+        // let start = Instant::now();
+
+        let result = self.get_events(from, to, vec![self.topics.new_user]).await;
+        // metrics::histogram!("eth_watcher.get_register_user_events", start.elapsed());
         result
     }
 
