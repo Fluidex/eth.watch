@@ -11,7 +11,7 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp, RegUserOp};
+use crate::types::{AddTokenOp, PriorityOp, RegUserOp};
 use futures::{
     channel::{mpsc, oneshot},
     StreamExt,
@@ -21,7 +21,7 @@ use std::{
     time::{Duration, Instant},
 };
 use tokio::time;
-use web3::types::{Address, BlockNumber};
+use web3::types::BlockNumber;
 
 pub use client::EthHttpClient;
 
@@ -55,18 +55,6 @@ pub enum EthWatchRequest {
         op_start_id: u64,
         max_chunks: usize,
         resp: oneshot::Sender<Vec<PriorityOp>>,
-    },
-    GetUnconfirmedDeposits {
-        address: Address,
-        resp: oneshot::Sender<Vec<PriorityOp>>,
-    },
-    GetUnconfirmedOps {
-        address: Address,
-        resp: oneshot::Sender<Vec<PriorityOp>>,
-    },
-    GetUnconfirmedOpByHash {
-        eth_hash: Vec<u8>,
-        resp: oneshot::Sender<Option<PriorityOp>>,
     },
 }
 
@@ -229,47 +217,6 @@ impl<W: EthClient> EthWatch<W> {
         result
     }
 
-    // TODO: fix
-    fn find_ongoing_op_by_hash(&self, eth_hash: &[u8]) -> Option<PriorityOp> {
-        self.eth_state
-            .unconfirmed_queue()
-            .iter()
-            .find(|op| op.eth_hash.as_bytes() == eth_hash)
-            .cloned()
-    }
-
-    // TODO: fix
-    // fn get_ongoing_deposits_for(&self, address: Address) -> Vec<PriorityOp> {
-    //     self.eth_state
-    //         .unconfirmed_queue()
-    //         .iter()
-    //         .filter(|op| match &op.data {
-    //             FluidexPriorityOp::Deposit(deposit) => {
-    //                 // Address may be set to either sender or recipient.
-    //                 deposit.from == address || deposit.to == address
-    //             }
-    //             _ => false,
-    //         })
-    //         .cloned()
-    //         .collect()
-    // }
-
-    // TODO: fix
-    fn get_ongoing_ops_for(&self, address: Address) -> Vec<PriorityOp> {
-        self.eth_state
-            .unconfirmed_queue()
-            .iter()
-            .filter(|op| match &op.data {
-                FluidexPriorityOp::Deposit(deposit) => {
-                    // Address may be set to sender.
-                    deposit.from == address
-                }
-                FluidexPriorityOp::FullExit(full_exit) => full_exit.eth_address == address,
-            })
-            .cloned()
-            .collect()
-    }
-
     async fn poll_eth_node(&mut self) -> anyhow::Result<()> {
         // let start = Instant::now();
         let last_block_number = self.client.block_number().await?;
@@ -372,19 +319,6 @@ impl<W: EthClient> EthWatch<W> {
                     resp,
                 } => {
                     resp.send(self.get_priority_requests(op_start_id, max_chunks)).unwrap_or_default();
-                }
-                EthWatchRequest::GetUnconfirmedDeposits { address: _, resp: _ } => {
-                    unimplemented!();
-                    // let deposits_for_address = self.get_ongoing_deposits_for(address);
-                    // resp.send(deposits_for_address).ok();
-                }
-                EthWatchRequest::GetUnconfirmedOps { address, resp } => {
-                    let deposits_for_address = self.get_ongoing_ops_for(address);
-                    resp.send(deposits_for_address).ok();
-                }
-                EthWatchRequest::GetUnconfirmedOpByHash { eth_hash, resp } => {
-                    let unconfirmed_op = self.find_ongoing_op_by_hash(&eth_hash);
-                    resp.send(unconfirmed_op).unwrap_or_default();
                 }
             }
         }
