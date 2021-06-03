@@ -11,7 +11,7 @@ use self::{
     received_ops::{sift_outdated_ops, ReceivedPriorityOp},
 };
 use crate::params;
-use crate::types::{AddTokenOp, FluidexPriorityOp, PriorityOp, RegUserOp};
+use crate::types::{AddTokenOp, PriorityOp, RegUserOp};
 use futures::{
     channel::{mpsc, oneshot},
     StreamExt,
@@ -21,7 +21,7 @@ use std::{
     time::{Duration, Instant},
 };
 use tokio::time;
-use web3::types::{Address, BlockNumber};
+use web3::types::BlockNumber;
 
 pub use client::EthHttpClient;
 
