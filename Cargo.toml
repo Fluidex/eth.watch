@@ -12,9 +12,9 @@ async-trait = "0.1"
 bigdecimal = { version = "0.2.0", features = [ "serde" ] }
 config_rs = { package = "config", version = "0.10.1" }
 dotenv = "0.15.0"
-env_logger = "0.5"
 ethabi = "12.0.0"
 futures = "0.3"
+fluidex-common = { git = "https://github.com/Fluidex/common-rs", branch = "master", features = [ "non-blocking-tracing" ] }
 hex = "0.4"
 jsonrpc-core = "14.0.3"
 log = "0.4"

@@ -1,6 +1,7 @@
 use eth_watcher::config;
 use eth_watcher::eth_client::EthereumGateway;
 use eth_watcher::eth_watch::{EthHttpClient, EthWatch, EthWatchRequest};
+use fluidex_common::non_blocking_tracing;
 use futures::{channel::mpsc, SinkExt};
 use tokio::{runtime::Runtime, time};
 
@@ -8,7 +9,7 @@ fn main() {
     let mut main_runtime = Runtime::new().expect("main runtime start");
 
     dotenv::dotenv().ok();
-    env_logger::init();
+    let _guard = non_blocking_tracing::setup();
     log::info!("ETH watcher started");
 
     let mut conf = config_rs::Config::new();
