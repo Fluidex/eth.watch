@@ -1,3 +1,5 @@
+#![allow(clippy::wrong_self_convention)]
+
 use crate::params;
 use anyhow::ensure;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
