@@ -1,3 +1,5 @@
+#![allow(clippy::wrong_self_convention)]
+
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 
