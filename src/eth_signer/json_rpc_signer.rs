@@ -285,9 +285,10 @@ mod messages {
 
         // Unlocks the address, after that the server can sign messages and transactions.
         pub fn unlock_account(address: Address, password: &str) -> Self {
-            let mut params = Vec::new();
-            params.push(serde_json::to_value(address).expect("serialization fail"));
-            params.push(serde_json::to_value(password).expect("serialization fail"));
+            let params = vec![
+                serde_json::to_value(address).expect("serialization fail"),
+                serde_json::to_value(password).expect("serialization fail"),
+            ];
             Self::create("personal_unlockAccount", params)
         }
 
