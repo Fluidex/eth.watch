@@ -14,7 +14,7 @@ config_rs = { package = "config", version = "0.10.1" }
 dotenv = "0.15.0"
 ethabi = "12.0.0"
 futures = "0.3"
-fluidex-common = { git = "https://github.com/Fluidex/common-rs", branch = "master", features = [ "non-blocking-tracing" ] }
+fluidex-common = { git = "https://github.com/fluidex/common-rs", branch = "master", features = [ "non-blocking-tracing" ] }
 hex = "0.4"
 jsonrpc-core = "14.0.3"
 log = "0.4"
